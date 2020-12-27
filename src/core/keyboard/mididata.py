@@ -95,6 +95,9 @@ class NoteData(MidiData):
         _verify_velocity(velocity)
         self._velocity = velocity
 
+    def __repr__(self):
+        return "NoteData(channel={!r}, pitch={!r}, velocity={!r})".format(
+            self.channel, self.pitch, self.velocity)
 
 class ProgramData(MidiData):
     """Represents a midi program signal.
@@ -103,7 +106,7 @@ class ProgramData(MidiData):
     ----------
         :channel: The channel the signal is linked to.
 
-        :number: Tumber of the midi program to apply.
+        :number: The number of the midi program to apply.
     """
 
     def __init__(self, channel=None, number=None):
@@ -135,6 +138,10 @@ class ProgramData(MidiData):
     def number(self, number):
         _verify_number(number)
         self._number = number
+
+    def __repr__(self):
+        return "ProgramData(channel={!r}, number={!r})".format(
+            self.channel, self.number)
 
 
 class ControlData(MidiData):
@@ -192,3 +199,7 @@ class ControlData(MidiData):
     def value(self, value):
         _verify_value(value)
         self._value = value
+
+    def __repr__(self):
+        return "ControlData(channel={!r}, number={!r}, value={!r})".format(
+            self.channel, self.number, self.value)
