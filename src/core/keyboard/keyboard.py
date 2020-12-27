@@ -4,6 +4,8 @@ __all__ = ["Keyboard", "Left96ButtonKeyboard", "Right81ButtonKeyboard"]
 
 from abc import ABC, abstractmethod
 
+from .mididata import MidiData
+
 
 class Keyboard(ABC):
     """Abstract class for representing a keyboard."""
@@ -41,7 +43,8 @@ class Keyboard(ABC):
 
         Returns
         -------
-        The wanted data (of type MidiData) or `None`.
+        MidiData
+            The wanted data or `None`.
 
         """
 
@@ -66,8 +69,45 @@ class Right81ButtonKeyboard(Keyboard):
     and 1 row of 17 buttons.
     """
 
+    def __init__(self, name=None):
+        super().__init__(name)
+        self.keyboard = [None, ]*81
+
     def set_data(self, identifier, data):
-        """See Keyboard.setData."""
+        """
+        Set the value of the data identified by `identifier`.
+
+        Parameters
+        ----------
+        identifier : int
+            index of the data to set (0-80).
+        data : MidiData
+            data to set.
+
+        Returns
+        -------
+        None.
+
+        """
+        if not isinstance(data, MidiData):
+            raise TypeError(
+                "data must be of type MidiData (or subclasses), not {}"
+                .format(type(data)))
+        self.keyboard[identifier] = data
 
     def get_data(self, identifier):
-        """See Keyboard.getData."""
+        """
+        Get the value of the data identified by `identifier`.
+
+        Parameters
+        ----------
+        identifier : int
+            index of the data to get (0-80).
+
+        Returns
+        -------
+        MidiData
+            The wanted data.
+
+        """
+        return self.keyboard[identifier]
