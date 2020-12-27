@@ -73,6 +73,9 @@ class Right81ButtonKeyboard(Keyboard):
         super().__init__(name)
         self.keyboard = [None, ]*81
 
+    def __repr__(self):
+        return "Right81ButtonKeyboard(name={!r})".format(self.name)
+
     def set_data(self, identifier, data):
         """
         Set the value of the data identified by `identifier`.
