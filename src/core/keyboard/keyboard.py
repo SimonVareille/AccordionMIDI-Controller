@@ -14,11 +14,11 @@ class Keyboard(ABC):
     @abstractmethod
     def set_data(self, identifier, data):
         """
-        Set the value of the data identified by `id`.
+        Set the value of the data identified by `identifier`.
 
         Parameters
         ----------
-        identifier : int
+        identifier : undefined
             Identifier of the data.
         data : MidiData
             Value of the data.
@@ -32,11 +32,11 @@ class Keyboard(ABC):
     @abstractmethod
     def get_data(self, identifier):
         """
-        Get the value of the data identified by `id`.
+        Get the value of the data identified by `identifier`.
 
         Parameters
         ----------
-        identifier : int
+        identifier : undefined
             Identifier of the data.
 
         Returns
