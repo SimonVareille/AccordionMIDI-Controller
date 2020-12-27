@@ -1,6 +1,6 @@
 """Definition of keyboards types."""
 
-__all__ = ["Keyboard", "LeftKeyboard", "RightKeyboard"]
+__all__ = ["Keyboard", "Left96ButtonKeyboard", "Right81ButtonKeyboard"]
 
 from abc import ABC, abstractmethod
 
@@ -46,8 +46,11 @@ class Keyboard(ABC):
         """
 
 
-class LeftKeyboard(Keyboard):
-    """Left keyboard representation."""
+class Left96ButtonKeyboard(Keyboard):
+    """Left keyboard.
+
+    Represent a left button keyboard of 96 button, as 6 rows of 16 buttons.
+    """
 
     def set_data(self, identifier, data):
         """See Keyboard.setData."""
@@ -56,8 +59,12 @@ class LeftKeyboard(Keyboard):
         """See Keyboard.getData."""
 
 
-class RightKeyboard(Keyboard):
-    """Right keyboard representation."""
+class Right81ButtonKeyboard(Keyboard):
+    """Right keyboard.
+
+    Represent a right button keyboard of 81 button, as 4 rows of 16 buttons
+    and 1 row of 17 buttons.
+    """
 
     def set_data(self, identifier, data):
         """See Keyboard.setData."""
