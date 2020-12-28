@@ -18,15 +18,32 @@ class MidiIO:
         self.close_inport()
         self.close_outport()
 
-    def clear_callback(self):
+    def _clear_inport_callback(self):
         """Clear the input port callback."""
         if self.inport:
             self.inport.callback = None
 
+    def set_callback(self, callback):
+        """
+        Set the callback used when a new keyboard is created.
+
+        Parameters
+        ----------
+        callback :
+            A callback function to be called when a new keyboard is created.
+            The function should take one argument (the keyboard).
+
+        Returns
+        -------
+        None.
+
+        """
+        self.keyboard_callback = callback
+
     def close_inport(self):
         """Close the input port."""
         if self.inport:
-            self.clear_callback()
+            self._clear_inport_callback()
             self.inport.close()
 
     def close_outport(self):
@@ -169,6 +186,18 @@ class MidiIO:
 
     def _process_sysex(self, data):
         print(data)
+        if data:
+            if data[0] == 1:  # receiving a keyboard
+                daoFactory = MidiDAOFactory()
+                dao = None
+                if data[2] == 0:
+                    dao = daoFactory.get_right_81_button_keyboard_dao()
+                elif data[2] == 1:
+                    dao = daoFactory.get_left_96_button_keyboard_dao()
+
+                if dao is not None:
+                    keyboard = dao.from_bytes(data[1:])
+                    self.keyboard_callback(keyboard)
 
     def send_sysex(self, data):
         """
