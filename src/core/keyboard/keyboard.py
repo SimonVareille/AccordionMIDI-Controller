@@ -138,7 +138,7 @@ class Right81ButtonKeyboard(Keyboard):
         Parameters
         ----------
         identifier : int
-            index of the data to set (0-80).
+            index of the data to set (1-81).
         data : MidiData
             data to set.
 
@@ -151,7 +151,7 @@ class Right81ButtonKeyboard(Keyboard):
             raise TypeError(
                 "data must be of type MidiData (or subclasses), not {}"
                 .format(type(data)))
-        self.keyboard[identifier] = data
+        self.keyboard[identifier-1] = data
 
     def get_data(self, identifier):
         """
@@ -160,7 +160,7 @@ class Right81ButtonKeyboard(Keyboard):
         Parameters
         ----------
         identifier : int
-            index of the data to get (0-80).
+            index of the data to get (1-81).
 
         Returns
         -------
@@ -168,4 +168,4 @@ class Right81ButtonKeyboard(Keyboard):
             The wanted data.
 
         """
-        return self.keyboard[identifier]
+        return self.keyboard[identifier-1]
