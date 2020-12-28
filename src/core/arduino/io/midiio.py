@@ -12,6 +12,7 @@ class MidiIO:
         super().__init__()
         self.outport = None
         self.inport = None
+        self.keyboard_callback = None
 
     def __del__(self):
         """Ensure proper deletion of instance."""
@@ -188,12 +189,12 @@ class MidiIO:
         print(data)
         if data:
             if data[0] == 1:  # receiving a keyboard
-                daoFactory = MidiDAOFactory()
+                dao_factory = MidiDAOFactory()
                 dao = None
                 if data[2] == 0:
-                    dao = daoFactory.get_right_81_button_keyboard_dao()
+                    dao = dao_factory.get_right_81_button_keyboard_dao()
                 elif data[2] == 1:
-                    dao = daoFactory.get_left_96_button_keyboard_dao()
+                    dao = dao_factory.get_left_96_button_keyboard_dao()
 
                 if dao is not None:
                     keyboard = dao.from_bytes(data[1:])
