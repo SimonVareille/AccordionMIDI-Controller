@@ -189,12 +189,11 @@ class MidiIO:
         print(data)
         if data:
             if data[0] == 1:  # receiving a keyboard
-                dao_factory = MidiDAOFactory()
                 dao = None
                 if data[2] == 0:
-                    dao = dao_factory.get_right_81_button_keyboard_dao()
+                    dao = Right81ButtonKeyboardMidiDAO
                 elif data[2] == 1:
-                    dao = dao_factory.get_left_96_button_keyboard_dao()
+                    dao = Left96ButtonKeyboardMidiDAO
 
                 if dao is not None:
                     keyboard = dao.from_bytes(data[1:])
