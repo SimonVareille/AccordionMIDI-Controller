@@ -30,6 +30,7 @@ class KeyboardMidiDAO(KeyboardDAO):
 class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
     """Represent a 96 left button keyboard's DAO using MIDI."""
 
+    @staticmethod
     def from_bytes(data: bytearray) -> Left96ButtonKeyboard:
         """
         Create a Keyboard from SysEx bytes.
