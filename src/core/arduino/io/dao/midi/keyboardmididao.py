@@ -45,3 +45,8 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             The created keyboard, or None if not a Left96ButtonKeyboard.
 
         """
+        if data[0] == 0x02:
+            data = data[1:]
+            for i in range(96):
+                pass
+        return None
