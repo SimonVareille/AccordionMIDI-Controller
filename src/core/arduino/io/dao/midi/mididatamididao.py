@@ -1,7 +1,7 @@
 """Definition of MidiData's DAO using MIDI protocol."""
 
 from abc import ABC, abstractmethod
-from core.keyboard import MidiData, NoteData, ProgramData
+from core.keyboard import MidiData, NoteData, ProgramData, ControlData
 
 
 class MidiDataMidiDAO(ABC):
@@ -135,4 +135,51 @@ class ProgramDataMidiDAO(MidiDataMidiDAO):
             The created bytearray, or None if not possible.
 
         """
-        return bytearray([0x01, data.channel, data.number])
+        return bytearray([0x02, data.channel, data.number])
+
+
+class ControlDataMidiDAO(MidiDataMidiDAO):
+    """Represents a ControlData using midi."""
+
+    @staticmethod
+    def from_bytes(data: bytearray) -> (ControlData, int):
+        """
+        Create a ControlData from SysEx bytes.
+
+        Parameters
+        ----------
+        data : bytearray
+            Part of the SysEx message containing the ControlData.
+
+        Returns
+        -------
+        ControlData
+            The created ControlData or None if not possible.
+        int
+            The number of bytes read.
+
+        """
+        if data[0] == 0x03:
+            channel = data[1]
+            number = data[2]
+            value = data[3]
+            return ControlData(channel, number, value), 4
+        return None, 0
+
+    @staticmethod
+    def to_bytes(data: ControlData) -> bytearray:
+        """
+        Create a SysEx bytearray from ControlData.
+
+        Parameters
+        ----------
+        data : ControlData
+            The data to convert to SysEx bytearray.
+
+        Returns
+        -------
+        bytearray
+            The created bytearray, or None if not possible.
+
+        """
+        return bytearray([0x03, data.channel, data.number, data.value])
