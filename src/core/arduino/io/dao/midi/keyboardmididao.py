@@ -1,5 +1,7 @@
 """Definition of keyboard's DAO using MIDI protocol."""
 
+import base64
+
 from abc import abstractmethod
 from core.arduino.io.dao.KeyboardDAO import KeyboardDAO
 from core.keyboard import Keyboard, Left96ButtonKeyboard
@@ -51,7 +53,12 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         if data[0] == 0x02:
             keyboard = Left96ButtonKeyboard()
 
-            data_index = 1
+            keyboard.name = bytes.decode(
+                base64.b64decode(
+                    data[1:data.index(0x00)]),
+                'utf-8')
+
+            data_index = data.index(0x00)+1
 
             # Index of the current key of the Left96ButtonKeyboard
             keyboard_index = -1
