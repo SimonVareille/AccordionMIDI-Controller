@@ -48,8 +48,9 @@ With:
 - `type` the identifier of the type of keyboard (one byte). See
    [Keyboard types](#keyboard-types)
    section.
-- `name` the name of the keyboard. As original name is a UTF-8 string, it must
-be converted to 7-bit stream. We simply use base-64 encoding to send it.
+- `name` the name of the keyboard. Must end with `0x00`. As original name is a
+UTF-8 string, it must be converted to 7-bit stream. We simply use base-64
+encoding to send it.
 - `data` the data of the keyboard. See [Keyboard types](#keyboard-types) section.
 
 ### Sending a keyboard to/from the Arduino RAM
@@ -68,8 +69,9 @@ With:
 - `type` the identifier of the type of keyboard (one byte). See
    [Keyboard types](#keyboard-types)
    section.
-- `name` the name of the keyboard. As original name is a UTF-8 string, it must
-be converted to 7-bit stream. We simply use base-64 encoding to send it.
+- `name` the name of the keyboard. Must end with `0x00`. As original name is a
+UTF-8 string, it must be converted to 7-bit stream. We simply use base-64
+encoding to send it.
 - `data` the data of the keyboard. See [Keyboard types](#keyboard-types) section.
 
 ### Delete a keyboard
@@ -87,8 +89,8 @@ With:
 - `type` the identifier of the type of keyboard (one byte). See
    [Keyboard types](#keyboard-types)
    section.
-- `name` the name of the keyboard. As original name is a UTF-8 string, it must
-be converted to 7-bit stream. We simply use base-64 encoding to send it.
+- `name` the name of the keyboard. Must end with `0x00`. As original name is a
+UTF-8 string, it must be converted to 7-bit stream. We simply use base-64 encoding to send it.
 
 ### Rename a keyboard
 
@@ -106,12 +108,12 @@ With:
 - `type` the identifier of the type of keyboard (one byte). See
    [Keyboard types](#keyboard-types)
    section.
-- `previous name` the previous name of the keyboard. As original name is a UTF-8
-   string, it must be converted to 7-bit stream. We simply use base-64 encoding
-   to send it.
-- `new name` the new name of the keyboard. As original name is a UTF-8
-   string, it must be converted to 7-bit stream. We simply use base-64 encoding
-   to send it.
+- `previous name` the previous name of the keyboard. Must end with `0x00`. As
+   original name is a UTF-8 string, it must be converted to 7-bit stream. We
+   simply use base-64 encoding to send it.
+- `new name` the new name of the keyboard. Must end with `0x00`. As original
+   name is a UTF-8 string, it must be converted to 7-bit stream. We simply use
+   base-64 encoding to send it.
 
 ## Keyboard types
 
