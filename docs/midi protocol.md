@@ -145,6 +145,8 @@ memory representation of the keyboard in the Arduino:
 
 The correspondence between the physical keyboard and the midi data array is:
 
+![alt text](left-96-keyboard-numbered.png "Left keyboard with 96 buttons")
+
 ## Midi data
 
 The midi data field describe the action to perform when the corresponding key is
