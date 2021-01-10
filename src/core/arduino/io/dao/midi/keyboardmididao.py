@@ -3,6 +3,8 @@
 from abc import abstractmethod
 from core.arduino.io.dao.KeyboardDAO import KeyboardDAO
 from core.keyboard import Keyboard, Left96ButtonKeyboard
+from .mididatamididao import NoteDataMidiDAO, ProgramDataMidiDAO,\
+    ControlDataMidiDAO
 
 
 class KeyboardMidiDAO(KeyboardDAO):
@@ -47,7 +49,27 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
         """
         if data[0] == 0x02:
-            data = data[1:]
-            for i in range(96):
-                pass
+            keyboard = Left96ButtonKeyboard()
+
+            data_index = 1
+
+            # Index of the current key of the Left96ButtonKeyboard
+            keyboard_index = -1
+            for _ in range(96):
+                data_midi_dao = None
+                if data[data_index] == 0x01:
+                    data_midi_dao = NoteDataMidiDAO
+                elif data[data_index] == 0x02:
+                    data_midi_dao = ProgramDataMidiDAO
+                elif data[data_index] == 0x03:
+                    data_midi_dao = ControlDataMidiDAO
+
+                midi_data, skip = data_midi_dao.from_bytes(data[data_index:])
+
+                keyboard.set_data(keyboard_index+2, midi_data)
+
+                keyboard_index = (keyboard_index + 16) % 95
+
+                data_index += skip
+            return keyboard
         return None
