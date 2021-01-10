@@ -21,7 +21,7 @@ class MidiDataMidiDAO(ABC):
         Returns
         -------
         MidiData
-            The created MidiData and the, or None if not possible.
+            The created MidiData, or None if not possible.
         int
             The number of bytes read.
         """
@@ -43,6 +43,7 @@ class MidiDataMidiDAO(ABC):
             The created bytearray, or None if not possible.
 
         """
+
 
 class NoteDataMidiDAO(MidiDataMidiDAO):
     """Represents a NoteData using midi."""
@@ -71,3 +72,21 @@ class NoteDataMidiDAO(MidiDataMidiDAO):
             velocity = data[3]
             return NoteData(channel, pitch, velocity), 4
         return None, 0
+
+    @staticmethod
+    def to_bytes(data: NoteData) -> bytearray:
+        """
+        Create a SysEx bytearray from NoteData.
+
+        Parameters
+        ----------
+        data : NoteData
+            The data to convert to SysEx bytearray.
+
+        Returns
+        -------
+        bytearray
+            The created bytearray, or None if not possible.
+
+        """
+        return bytearray([0x01, data.channel, data.pitch, data.velocity])
