@@ -65,6 +65,11 @@ class NoteData(MidiData):
         _verify_velocity(velocity)
         self._velocity = velocity
 
+    def __eq__(self, o):
+        return self._channel == o._channel and\
+            self._pitch == o._pitch and\
+            self._velocity == o._velocity
+
     @property
     def channel(self):
         # pylint: disable=C0116
@@ -119,6 +124,10 @@ class ProgramData(MidiData):
         _verify_number(number)
         self._number = number
 
+    def __eq__(self, o):
+        return self._channel == o._channel and\
+            self._number == o._number
+
     @property
     def channel(self):
         # pylint: disable=C0116
@@ -169,6 +178,11 @@ class ControlData(MidiData):
 
         _verify_value(value)
         self._value = value
+
+    def __eq__(self, o):
+        return self._channel == o._channel and\
+            self._number == o._number and\
+            self._value == o._value
 
     @property
     def channel(self):

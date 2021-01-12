@@ -72,6 +72,14 @@ class Left96ButtonKeyboard(Keyboard):
     def __repr__(self):
         return "Left96ButtonKeyboard(name={!r})".format(self.name)
 
+    def __eq__(self, o):
+        if self.name == o.name:
+            for i in range(96):
+                if self.keyboard[i] != o.keyboard[i]:
+                    return False
+            return True
+        return False
+
     def set_data(self, identifier, data):
         """
         Set the value of the data identified by `identifier`.
@@ -133,6 +141,14 @@ class Right81ButtonKeyboard(Keyboard):
 
     def __repr__(self):
         return "Right81ButtonKeyboard(name={!r})".format(self.name)
+
+    def __eq__(self, o):
+        if self.name == o.name:
+            for i in range(81):
+                if self.keyboard[i] != o.keyboard[i]:
+                    return False
+            return True
+        return False
 
     def set_data(self, identifier, data):
         """
