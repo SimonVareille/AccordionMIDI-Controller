@@ -3,8 +3,9 @@
 import base64
 
 from abc import abstractmethod
-from core.arduino.io.dao.KeyboardDAO import KeyboardDAO
-from core.keyboard import Keyboard, Left96ButtonKeyboard
+from ..keyboarddao import KeyboardDAO
+from core.keyboard import Keyboard, Left96ButtonKeyboard, NoteData,\
+    ProgramData, ControlData
 from .mididatamididao import NoteDataMidiDAO, ProgramDataMidiDAO,\
     ControlDataMidiDAO
 
@@ -80,3 +81,65 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
                 data_index += skip
             return keyboard
         return None
+
+    @staticmethod
+    def _to_bytes(kbd: Left96ButtonKeyboard) -> bytes:
+        """
+        Create a SysEx bytearray from a Left96ButtonKeyboard.
+
+        Parameters
+        ----------
+        kbd : Left96ButtonKeyboard
+            The keyboard to convert.
+
+        Returns
+        -------
+        bytearray
+            The created bytearray..
+
+        """
+        data = bytes([0x02])
+        data += base64.b64encode(kbd.name.encode('utf-8'))
+        data += bytes([0x00, ])
+
+        keyboard_index = -1
+        for i in range(96):
+            midi_dao = None
+            if isinstance(kbd.get_data(keyboard_index+2), NoteData):
+                midi_dao = NoteDataMidiDAO
+            elif isinstance(kbd.get_data(keyboard_index+2), ProgramData):
+                midi_dao = ProgramDataMidiDAO
+            elif isinstance(kbd.get_data(keyboard_index+2), ControlData):
+                midi_dao = ControlDataMidiDAO
+            # print(kbd.get_data(keyboard_index+2))
+            data += midi_dao.to_bytes(
+                    kbd.get_data(keyboard_index+2))
+            keyboard_index = (keyboard_index + 16) % 95
+
+        return data
+
+    def send_set_current_keyboard(self, kbd: Left96ButtonKeyboard) -> None:
+        """
+        Set the given keyboard as current on remote.
+
+        Parameters
+        ----------
+        kbd : Left96ButtonKeyboard
+            The keyboard to set.
+
+        Returns
+        -------
+        None.
+
+        """
+        data = bytes([0x02, ])
+        data += self._to_bytes(kbd)
+
+    def send_store_keyboard(self, kbd: Keyboard) -> None:
+        pass
+
+    def send_delete_keyboard(self, kbd: Keyboard) -> None:
+        pass
+
+    def send_rename_keyboard(self, kbd: Keyboard, new_name: str) -> None:
+        pass
