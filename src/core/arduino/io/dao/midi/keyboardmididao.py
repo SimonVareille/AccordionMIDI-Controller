@@ -8,6 +8,7 @@ from core.keyboard import Keyboard, Left96ButtonKeyboard, NoteData,\
     ProgramData, ControlData
 from .mididatamididao import NoteDataMidiDAO, ProgramDataMidiDAO,\
     ControlDataMidiDAO
+from core.arduino.io import midi_io
 
 
 class KeyboardMidiDAO(KeyboardDAO):
@@ -35,6 +36,8 @@ class KeyboardMidiDAO(KeyboardDAO):
 class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
     """Represent a 96 left button keyboard's DAO using MIDI."""
 
+    _keyboard_type = 0x02
+
     @staticmethod
     def from_bytes(data: bytearray) -> Left96ButtonKeyboard:
         """
@@ -51,7 +54,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             The created keyboard, or None if not a Left96ButtonKeyboard.
 
         """
-        if data[0] == 0x02:
+        if data[0] == Left96ButtonKeyboardMidiDAO._keyboard_type:
             keyboard = Left96ButtonKeyboard()
 
             keyboard.name = bytes.decode(
@@ -98,9 +101,9 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             The created bytearray..
 
         """
-        data = bytes([0x02])
+        data = bytes([Left96ButtonKeyboardMidiDAO._keyboard_type])
         data += base64.b64encode(kbd.name.encode('utf-8'))
-        data += bytes([0x00, ])
+        data += bytes([0x00])
 
         keyboard_index = -1
         for i in range(96):
@@ -132,14 +135,69 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         None.
 
         """
-        data = bytes([0x02, ])
+        data = bytes([0x02])
         data += self._to_bytes(kbd)
+        midi_io.send_sysex(data)
 
-    def send_store_keyboard(self, kbd: Keyboard) -> None:
-        pass
+    def send_store_keyboard(self, kbd: Left96ButtonKeyboard) -> None:
+        """
+        Store the given keyboard on remote.
 
-    def send_delete_keyboard(self, kbd: Keyboard) -> None:
-        pass
+        Parameters
+        ----------
+        kbd : Left96ButtonKeyboard
+            The keyboard to store.
 
-    def send_rename_keyboard(self, kbd: Keyboard, new_name: str) -> None:
-        pass
+        Returns
+        -------
+        None.
+
+        """
+        data = bytes([0x01])
+        data += self._to_bytes(kbd)
+        midi_io.send_sysex(data)
+
+    def send_delete_keyboard(self, kbd: Left96ButtonKeyboard) -> None:
+        """
+        Delete the given keyboard from remote.
+
+        Parameters
+        ----------
+        kbd : Left96ButtonKeyboard
+            The keyboard to delete.
+
+        Returns
+        -------
+        None.
+
+        """
+        data = [0x04]
+        data += bytes([self._keyboard_type])
+        data += base64.b64encode(kbd.name.encode('utf-8'))
+        data += bytes([0x00])
+        midi_io.send_sysex(data)
+
+    def send_rename_keyboard(self, kbd: Left96ButtonKeyboard,
+                             new_name: str) -> None:
+        """
+        Rename the given keyboard on remote.
+
+        Parameters
+        ----------
+        kbd : Left96ButtonKeyboard
+            The keyboard to rename.
+        new_name : str
+            The new name.
+
+        Returns
+        -------
+        None.
+
+        """
+        data = [0x08]
+        data += bytes([self._keyboard_type])
+        data += base64.b64encode(kbd.name.encode('utf-8'))
+        data += bytes([0x00])
+        data += base64.b64encode(new_name.encode('utf-8'))
+        data += bytes([0x00])
+        midi_io.send_sysex(data)
