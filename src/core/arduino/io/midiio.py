@@ -194,9 +194,9 @@ class MidiIO:
                data[0] & 2):  # receiving a keyboard from RAM
                 dao = None
                 if data[1] == 0x01:
-                    dao = Right81ButtonKeyboardMidiDAO
+                    dao = Right81ButtonKeyboardMidiDAO()
                 elif data[1] == 0x02:
-                    dao = Left96ButtonKeyboardMidiDAO
+                    dao = Left96ButtonKeyboardMidiDAO()
 
                 if dao is not None:
                     keyboard = dao.from_bytes(data[1:])
