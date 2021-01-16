@@ -3,6 +3,7 @@
 __all__ = ["midi_io"]
 
 import mido
+from .dao.midi import Right81ButtonKeyboardMidiDAO, Left96ButtonKeyboardMidiDAO
 
 
 class MidiIO:
@@ -32,7 +33,9 @@ class MidiIO:
         ----------
         callback :
             A callback function to be called when a new keyboard is created.
-            The function should take one argument (the keyboard).
+            The function should take two arguments :
+                :keyboard: the keyboard
+                :origin: the origin of the keyboard (EEPROM or RAM)
 
         Returns
         -------
@@ -186,18 +189,18 @@ class MidiIO:
         return False
 
     def _process_sysex(self, data):
-        print(data)
         if data:
-            if data[0] == 1:  # receiving a keyboard
+            if (data[0] & 1 or  # receiving a keyboard from EEPROM
+               data[0] & 2):  # receiving a keyboard from RAM
                 dao = None
-                if data[2] == 0:
+                if data[1] == 0x01:
                     dao = Right81ButtonKeyboardMidiDAO
-                elif data[2] == 1:
+                elif data[1] == 0x02:
                     dao = Left96ButtonKeyboardMidiDAO
 
                 if dao is not None:
                     keyboard = dao.from_bytes(data[1:])
-                    self.keyboard_callback(keyboard)
+                    self.keyboard_callback(keyboard, data[0])
 
     def send_sysex(self, data):
         """
