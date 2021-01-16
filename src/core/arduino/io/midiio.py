@@ -1,6 +1,6 @@
 """Communication between arduino and computer, through MIDI."""
 
-__all__ = ["MidiIO"]
+__all__ = ["midi_io"]
 
 import mido
 
@@ -220,3 +220,6 @@ class MidiIO:
         """Receive messages callback."""
         if message.type == "sysex":
             self._process_sysex(message.data)
+
+
+midi_io = MidiIO()
