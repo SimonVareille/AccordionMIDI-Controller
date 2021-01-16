@@ -8,7 +8,7 @@ from core.keyboard import Keyboard, Left96ButtonKeyboard, NoteData,\
     ProgramData, ControlData
 from .mididatamididao import NoteDataMidiDAO, ProgramDataMidiDAO,\
     ControlDataMidiDAO
-from core.arduino.io import midi_io
+import core.arduino.io.midiio as midiio
 
 
 class KeyboardMidiDAO(KeyboardDAO):
@@ -59,7 +59,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
             keyboard.name = bytes.decode(
                 base64.b64decode(
-                    data[1:data.index(0x00)]),
+                    bytes(data[1:data.index(0x00)])),
                 'utf-8')
 
             data_index = data.index(0x00)+1
@@ -137,7 +137,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         """
         data = bytes([0x02])
         data += self._to_bytes(kbd)
-        midi_io.send_sysex(data)
+        midiio.midi_io.send_sysex(data)
 
     def send_store_keyboard(self, kbd: Left96ButtonKeyboard) -> None:
         """
@@ -155,7 +155,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         """
         data = bytes([0x01])
         data += self._to_bytes(kbd)
-        midi_io.send_sysex(data)
+        midiio.midi_io.send_sysex(data)
 
     def send_delete_keyboard(self, kbd: Left96ButtonKeyboard) -> None:
         """
@@ -175,7 +175,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         data += bytes([self._keyboard_type])
         data += base64.b64encode(kbd.name.encode('utf-8'))
         data += bytes([0x00])
-        midi_io.send_sysex(data)
+        midiio.midi_io.send_sysex(data)
 
     def send_rename_keyboard(self, kbd: Left96ButtonKeyboard,
                              new_name: str) -> None:
@@ -200,4 +200,8 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         data += bytes([0x00])
         data += base64.b64encode(new_name.encode('utf-8'))
         data += bytes([0x00])
-        midi_io.send_sysex(data)
+        midiio.midi_io.send_sysex(data)
+
+
+class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
+    pass
