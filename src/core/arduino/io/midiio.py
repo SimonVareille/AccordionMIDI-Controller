@@ -1,9 +1,10 @@
 """Communication between arduino and computer, through MIDI."""
 
+from typing import List
 import mido
 from .dao.midi import Right81ButtonKeyboardMidiDAO, Left96ButtonKeyboardMidiDAO
-from typing import List
 
+# pylint: disable=C0103
 
 outport = None
 """The output port.
@@ -48,7 +49,7 @@ def close():
     close_outport()
 
 
-def connect(outport: str = None, inport: str = None):
+def connect(outprt: str = None, inprt: str = None):
     """
     Connect to the specified MIDI output and input ports, if not None.
 
@@ -66,8 +67,8 @@ def connect(outport: str = None, inport: str = None):
     None.
 
     """
-    connect_output(outport)
-    connect_input(inport)
+    connect_output(outprt)
+    connect_input(inprt)
 
 
 def connect_input(port: str = None):
@@ -91,6 +92,7 @@ def connect_input(port: str = None):
     If connection fails, raises an error.
 
     """
+    # pylint: disable=W0603
     global inport
     if not port:
         inport = mido.open_input(callback=_message_recv)
@@ -119,6 +121,7 @@ def connect_output(port: str = None):
     If connection fails, raises an error.
 
     """
+    # pylint: disable=W0603
     global outport
     if not port:
         outport = mido.open_output(autoreset=False)
@@ -194,6 +197,7 @@ def _process_sysex(data: bytes):
 
             if dao is not None:
                 keyboard = dao.from_bytes(data[1:])
+                # pylint: disable=E1102
                 callback(keyboard, data[0])
 
 
