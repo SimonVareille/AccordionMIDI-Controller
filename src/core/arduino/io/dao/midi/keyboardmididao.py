@@ -50,7 +50,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         """
         data = bytes([0x02])
         data += self._to_bytes(kbd)
-        midiio.midi_io.send_sysex(data)
+        midiio.send_sysex(data)
 
     def send_store_keyboard(self, kbd: Keyboard) -> None:
         """
@@ -68,7 +68,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         """
         data = bytes([0x01])
         data += self._to_bytes(kbd)
-        midiio.midi_io.send_sysex(data)
+        midiio.send_sysex(data)
 
     def send_delete_keyboard(self, kbd: Keyboard) -> None:
         """
@@ -88,7 +88,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         data += bytes([self._keyboard_type])
         data += base64.b64encode(kbd.name.encode('utf-8'))
         data += bytes([0x00])
-        midiio.midi_io.send_sysex(data)
+        midiio.send_sysex(data)
 
     def send_rename_keyboard(self, kbd: Keyboard,
                              new_name: str) -> None:
@@ -113,7 +113,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         data += bytes([0x00])
         data += base64.b64encode(new_name.encode('utf-8'))
         data += bytes([0x00])
-        midiio.midi_io.send_sysex(data)
+        midiio.send_sysex(data)
 
 
 class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
