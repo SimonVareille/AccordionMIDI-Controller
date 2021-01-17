@@ -3,18 +3,19 @@
 import base64
 
 from abc import abstractmethod
-from ..keyboarddao import KeyboardDAO
+import core.arduino.io.midiio as midiio
 from core.keyboard import Keyboard, Left96ButtonKeyboard,\
     Right81ButtonKeyboard, NoteData, ProgramData, ControlData
+from ..keyboarddao import KeyboardDAO
 from .mididatamididao import NoteDataMidiDAO, ProgramDataMidiDAO,\
     ControlDataMidiDAO
-import core.arduino.io.midiio as midiio
 
 
 class KeyboardMidiDAO(KeyboardDAO):
     """Abstract class for representing a keyboard's DAO using MIDI."""
 
     def __init__(self):
+        super().__init__()
         self._keyboard_type = None
 
     @abstractmethod
@@ -31,6 +32,22 @@ class KeyboardMidiDAO(KeyboardDAO):
         -------
         Keyboard
             The created keyboard, or None if not a valid keyboard.
+
+        """
+
+    def _to_bytes(self, kbd: Keyboard) -> bytes:
+        """
+        Create a SysEx bytearray from a Keyboard.
+
+        Parameters
+        ----------
+        kbd : Keyboard
+            The keyboard to convert.
+
+        Returns
+        -------
+        bytes
+            The created bytearray.
 
         """
 
@@ -189,7 +206,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         data += bytes([0x00])
 
         keyboard_index = -1
-        for i in range(96):
+        for _ in range(96):
             midi_dao = None
             if isinstance(kbd.get_data(keyboard_index+2), NoteData):
                 midi_dao = NoteDataMidiDAO
@@ -197,7 +214,6 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
                 midi_dao = ProgramDataMidiDAO
             elif isinstance(kbd.get_data(keyboard_index+2), ControlData):
                 midi_dao = ControlDataMidiDAO
-            # print(kbd.get_data(keyboard_index+2))
             data += midi_dao.to_bytes(
                     kbd.get_data(keyboard_index+2))
             keyboard_index = (keyboard_index + 16) % 95
@@ -212,7 +228,8 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         super().__init__()
         self._keyboard_type = 0x01
 
-    def _get_midi_data(self, data, data_index):
+    @staticmethod
+    def _get_midi_data(data, data_index):
         data_midi_dao = None
         if data[data_index] == 0x01:
             data_midi_dao = NoteDataMidiDAO
@@ -222,7 +239,8 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             data_midi_dao = ControlDataMidiDAO
         return data_midi_dao.from_bytes(data[data_index:])
 
-    def _get_midi_data_dao(self, midi_data):
+    @staticmethod
+    def _get_midi_data_dao(midi_data):
         midi_dao = None
         if isinstance(midi_data, NoteData):
             midi_dao = NoteDataMidiDAO
