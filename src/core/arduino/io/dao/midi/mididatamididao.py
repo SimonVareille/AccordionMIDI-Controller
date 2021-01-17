@@ -9,13 +9,13 @@ class MidiDataMidiDAO(ABC):
 
     @staticmethod
     @abstractmethod
-    def from_bytes(data: bytearray) -> (MidiData, int):
+    def from_bytes(data: bytes) -> (MidiData, int):
         """
         Create a MidiData from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray
+        data : bytes
             Part of the SysEx message containing the MidiData.
 
         Returns
@@ -28,7 +28,7 @@ class MidiDataMidiDAO(ABC):
 
     @staticmethod
     @abstractmethod
-    def to_bytes(data: MidiData) -> bytearray:
+    def to_bytes(data: MidiData) -> bytes:
         """
         Create a SysEx bytearray from MidiData.
 
@@ -39,7 +39,7 @@ class MidiDataMidiDAO(ABC):
 
         Returns
         -------
-        bytearray
+        bytes
             The created bytearray, or None if not possible.
 
         """
@@ -49,13 +49,13 @@ class NoteDataMidiDAO(MidiDataMidiDAO):
     """Represents a NoteData using midi."""
 
     @staticmethod
-    def from_bytes(data: bytearray) -> (NoteData, int):
+    def from_bytes(data: bytes) -> (NoteData, int):
         """
         Create a NoteData from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray
+        data : bytes
             Part of the SysEx message containing the NoteData.
 
         Returns
@@ -74,7 +74,7 @@ class NoteDataMidiDAO(MidiDataMidiDAO):
         return None, 0
 
     @staticmethod
-    def to_bytes(data: NoteData) -> bytearray:
+    def to_bytes(data: NoteData) -> bytes:
         """
         Create a SysEx bytearray from NoteData.
 
@@ -85,24 +85,24 @@ class NoteDataMidiDAO(MidiDataMidiDAO):
 
         Returns
         -------
-        bytearray
+        bytes
             The created bytearray, or None if not possible.
 
         """
-        return bytearray([0x01, data.channel, data.pitch, data.velocity])
+        return bytes([0x01, data.channel, data.pitch, data.velocity])
 
 
 class ProgramDataMidiDAO(MidiDataMidiDAO):
     """Represents a ProgramData using midi."""
 
     @staticmethod
-    def from_bytes(data: bytearray) -> (ProgramData, int):
+    def from_bytes(data: bytes) -> (ProgramData, int):
         """
         Create a ProgramData from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray
+        data : bytes
             Part of the SysEx message containing the ProgramData.
 
         Returns
@@ -120,7 +120,7 @@ class ProgramDataMidiDAO(MidiDataMidiDAO):
         return None, 0
 
     @staticmethod
-    def to_bytes(data: ProgramData) -> bytearray:
+    def to_bytes(data: ProgramData) -> bytes:
         """
         Create a SysEx bytearray from ProgramData.
 
@@ -131,24 +131,24 @@ class ProgramDataMidiDAO(MidiDataMidiDAO):
 
         Returns
         -------
-        bytearray
+        bytes
             The created bytearray, or None if not possible.
 
         """
-        return bytearray([0x02, data.channel, data.number])
+        return bytes([0x02, data.channel, data.number])
 
 
 class ControlDataMidiDAO(MidiDataMidiDAO):
     """Represents a ControlData using midi."""
 
     @staticmethod
-    def from_bytes(data: bytearray) -> (ControlData, int):
+    def from_bytes(data: bytes) -> (ControlData, int):
         """
         Create a ControlData from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray
+        data : bytes
             Part of the SysEx message containing the ControlData.
 
         Returns
@@ -167,7 +167,7 @@ class ControlDataMidiDAO(MidiDataMidiDAO):
         return None, 0
 
     @staticmethod
-    def to_bytes(data: ControlData) -> bytearray:
+    def to_bytes(data: ControlData) -> bytes:
         """
         Create a SysEx bytearray from ControlData.
 
@@ -178,8 +178,8 @@ class ControlDataMidiDAO(MidiDataMidiDAO):
 
         Returns
         -------
-        bytearray
+        bytes
             The created bytearray, or None if not possible.
 
         """
-        return bytearray([0x03, data.channel, data.number, data.value])
+        return bytes([0x03, data.channel, data.number, data.value])

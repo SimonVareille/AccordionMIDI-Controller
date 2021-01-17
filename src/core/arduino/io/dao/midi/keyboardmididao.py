@@ -18,13 +18,13 @@ class KeyboardMidiDAO(KeyboardDAO):
         self._keyboard_type = None
 
     @abstractmethod
-    def from_bytes(self, data: bytearray) -> Keyboard:
+    def from_bytes(self, data: bytes) -> Keyboard:
         """
         Create a Keyboard from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray, tuple or list of bytes
+        data : bytes, tuple or list of bytes
             Part of the SysEx message containing the keyboard.
 
         Returns
@@ -123,13 +123,13 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
         super().__init__()
         self._keyboard_type = 0x02
 
-    def from_bytes(self, data: bytearray) -> Left96ButtonKeyboard:
+    def from_bytes(self, data: bytes) -> Left96ButtonKeyboard:
         """
         Create a Keyboard from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray, tuple or list of bytes
+        data : bytes, tuple or list of bytes
             Part of the SysEx message containing the keyboard.
 
         Returns
@@ -180,8 +180,8 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
         Returns
         -------
-        bytearray
-            The created bytearray..
+        bytes
+            The created bytearray.
 
         """
         data = bytes([self._keyboard_type])
@@ -232,13 +232,13 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             midi_dao = ControlDataMidiDAO
         return midi_dao
 
-    def from_bytes(self, data: bytearray) -> Right81ButtonKeyboard:
+    def from_bytes(self, data: bytes) -> Right81ButtonKeyboard:
         """
         Create a Keyboard from SysEx bytes.
 
         Parameters
         ----------
-        data : bytearray, tuple or list of bytes
+        data : bytes, tuple or list of bytes
             Part of the SysEx message containing the keyboard.
 
         Returns
@@ -287,8 +287,8 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
         Returns
         -------
-        bytearray
-            The created bytearray..
+        bytes
+            The created bytearray.
 
         """
         data = bytes([self._keyboard_type])
