@@ -1,7 +1,8 @@
 """Factory for the DAOs."""
 from abc import ABC, abstractmethod
 from .keyboarddao import KeyboardDAO
-from .midi import Left96ButtonKeyboardMidiDAO, Right81ButtonKeyboardMidiDAO
+from .midi import KeyboardMidiDAO, Left96ButtonKeyboardMidiDAO,\
+    Right81ButtonKeyboardMidiDAO
 
 
 class DAOFactory(ABC):
@@ -9,6 +10,19 @@ class DAOFactory(ABC):
 
     def __init__(self):
         pass
+
+    @staticmethod
+    @abstractmethod
+    def get_generic_keyboard_dao() -> KeyboardDAO:
+        """
+        Return the generic keyboard's DAO.
+
+        Returns
+        -------
+        KeyboardDAO
+            The keyboard's DAO.
+
+        """
 
     @staticmethod
     @abstractmethod
@@ -39,6 +53,19 @@ class DAOFactory(ABC):
 
 class MidiDAOFactory(DAOFactory):
     """Factory for creating KeyboardMidiDAO."""
+
+    @staticmethod
+    def get_generic_keyboard_dao() -> type:
+        """
+        Return the generic KeyboardMidiDAO.
+
+        Returns
+        -------
+        type
+            The KeyboardMidiDAO.
+
+        """
+        return KeyboardMidiDAO
 
     @staticmethod
     def get_left_96_button_keyboard_dao() -> Left96ButtonKeyboardMidiDAO:
