@@ -198,7 +198,7 @@ def _process_sysex(data: bytes):
             if dao is not None:
                 keyboard = dao.from_bytes(data[1:])
                 # pylint: disable=E1102
-                callback(keyboard, data[0])
+                callback(keyboard, "EEPROM" if data[0] == 1 else "RAM")
 
 
 def send_sysex(data: bytes):
