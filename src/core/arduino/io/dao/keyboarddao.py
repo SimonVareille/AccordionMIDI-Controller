@@ -10,6 +10,18 @@ class KeyboardDAO(ABC):
     def __init__(self):
         pass
 
+    @staticmethod
+    @abstractmethod
+    def send_fetch_keyboards():
+        """
+        Ask remote to send keyboards.
+
+        Returns
+        -------
+        None.
+
+        """
+
     @abstractmethod
     def send_set_current_keyboard(self, kbd: Keyboard) -> None:
         """

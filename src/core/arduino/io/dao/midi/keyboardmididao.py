@@ -51,6 +51,18 @@ class KeyboardMidiDAO(KeyboardDAO):
 
         """
 
+    @staticmethod
+    def send_fetch_keyboards():
+        """
+        Ask remote to send keyboards.
+
+        Returns
+        -------
+        None.
+
+        """
+        midiio.send_sysex([0x00])
+
     def send_set_current_keyboard(self, kbd: Keyboard) -> None:
         """
         Set the given keyboard as current on remote.
