@@ -1,7 +1,7 @@
 """Factory for the DAOs."""
 from abc import ABC, abstractmethod
-from .keyboarddao import KeyboardDAO, Left96ButtonKeyboardMidiDAO,\
-    Right81ButtonKeyboardMidiDAO
+from .keyboarddao import KeyboardDAO
+from .midi import Left96ButtonKeyboardMidiDAO, Right81ButtonKeyboardMidiDAO
 
 
 class DAOFactory(ABC):
