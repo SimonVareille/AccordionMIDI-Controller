@@ -10,11 +10,11 @@ from .mididata import MidiData
 class Keyboard(ABC):
     """Abstract class for representing a keyboard."""
 
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
         self.name = name
 
     @abstractmethod
-    def set_data(self, identifier, data):
+    def set_data(self, identifier, data: MidiData):
         """
         Set the value of the data identified by `identifier`.
 
@@ -65,7 +65,7 @@ class Left96ButtonKeyboard(Keyboard):
 
     """
 
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
         super().__init__(name)
         self.keyboard = [None, ]*96
 
@@ -80,7 +80,7 @@ class Left96ButtonKeyboard(Keyboard):
             return True
         return False
 
-    def set_data(self, identifier, data):
+    def set_data(self, identifier: int, data: MidiData):
         """
         Set the value of the data identified by `identifier`.
 
@@ -102,7 +102,7 @@ class Left96ButtonKeyboard(Keyboard):
                 .format(type(data)))
         self.keyboard[identifier-1] = data
 
-    def get_data(self, identifier):
+    def get_data(self, identifier: int):
         """
         Get the value of the data identified by `identifier`.
 
@@ -135,7 +135,7 @@ class Right81ButtonKeyboard(Keyboard):
          1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
     """
 
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
         super().__init__(name)
         self.keyboard = [None, ]*81
 
@@ -150,7 +150,7 @@ class Right81ButtonKeyboard(Keyboard):
             return True
         return False
 
-    def set_data(self, identifier, data):
+    def set_data(self, identifier: int, data: MidiData):
         """
         Set the value of the data identified by `identifier`.
 
@@ -172,7 +172,7 @@ class Right81ButtonKeyboard(Keyboard):
                 .format(type(data)))
         self.keyboard[identifier-1] = data
 
-    def get_data(self, identifier):
+    def get_data(self, identifier: int):
         """
         Get the value of the data identified by `identifier`.
 

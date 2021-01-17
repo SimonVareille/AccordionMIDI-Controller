@@ -2,6 +2,7 @@
 
 import mido
 from .dao.midi import Right81ButtonKeyboardMidiDAO, Left96ButtonKeyboardMidiDAO
+from typing import List
 
 
 outport = None
@@ -47,7 +48,7 @@ def close():
     close_outport()
 
 
-def connect(outport=None, inport=None):
+def connect(outport: str = None, inport: str = None):
     """
     Connect to the specified MIDI output and input ports, if not None.
 
@@ -69,7 +70,7 @@ def connect(outport=None, inport=None):
     connect_input(inport)
 
 
-def connect_input(port=None):
+def connect_input(port: str = None):
     """
     Connect to the specified input port.
 
@@ -97,7 +98,7 @@ def connect_input(port=None):
         inport = mido.open_input(port, callback=_message_recv)
 
 
-def connect_output(port=None):
+def connect_output(port: str = None):
     """
     Connect to the specified output port.
 
@@ -125,7 +126,7 @@ def connect_output(port=None):
         outport = mido.open_output(port, autoreset=False)
 
 
-def list_input_ports():
+def list_input_ports() -> List[str]:
     """
     List available input ports.
 
@@ -138,7 +139,7 @@ def list_input_ports():
     return mido.get_input_names()
 
 
-def list_output_ports():
+def list_output_ports() -> List[str]:
     """
     List available output ports.
 
@@ -151,7 +152,7 @@ def list_output_ports():
     return mido.get_output_names()
 
 
-def input_ready():
+def input_ready() -> bool:
     """
     Return True if the input is ready to use, False otherwise.
 
@@ -166,7 +167,7 @@ def input_ready():
     return False
 
 
-def output_ready():
+def output_ready() -> bool:
     """
     Return True if the output is ready to use, False otherwise.
 
@@ -181,7 +182,7 @@ def output_ready():
     return False
 
 
-def _process_sysex(data):
+def _process_sysex(data: bytes):
     if data:
         if (data[0] & 1 or  # receiving a keyboard from EEPROM
            data[0] & 2):  # receiving a keyboard from RAM
@@ -196,7 +197,7 @@ def _process_sysex(data):
                 callback(keyboard, data[0])
 
 
-def send_sysex(data):
+def send_sysex(data: bytes):
     """
     Send a sysex message with given data.
 
@@ -214,7 +215,7 @@ def send_sysex(data):
     outport.send(msg)
 
 
-def _message_recv(message):
+def _message_recv(message: mido.Message):
     """Receive messages callback."""
     if message.type == "sysex":
         _process_sysex(message.data)
