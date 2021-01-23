@@ -73,7 +73,7 @@ class Left96ButtonKeyboard(Keyboard):
         return "Left96ButtonKeyboard(name={!r})".format(self.name)
 
     def __eq__(self, o):
-        if self.name == o.name:
+        if isinstance(o, Left96ButtonKeyboard) and self.name == o.name:
             for i in range(96):
                 if self.keyboard[i] != o.keyboard[i]:
                     return False
@@ -143,7 +143,7 @@ class Right81ButtonKeyboard(Keyboard):
         return "Right81ButtonKeyboard(name={!r})".format(self.name)
 
     def __eq__(self, o):
-        if self.name == o.name:
+        if isinstance(o, Right81ButtonKeyboard) and self.name == o.name:
             for i in range(81):
                 if self.keyboard[i] != o.keyboard[i]:
                     return False
