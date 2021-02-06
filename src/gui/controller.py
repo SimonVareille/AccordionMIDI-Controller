@@ -24,19 +24,37 @@ class ControllerGUI(QMainWindow):
         self.toolbar = ToolBar(self)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
 
+        # self.connect_toolbar()
+
         self.statusBar().showMessage("Initialization done")
 
-    # def connect_toolbar(self):
-    #     self.toolbar.pull_action.triggered.connect(self.pull_layouts)
-    #     self.toolbar.create_keyboard_action.triggered.connect(self.create_layout)
-    #     self.clone_layout_action.triggered.connect(self.clone_layout)
-    #     self.delete_layout_action.triggered.connect(self.delete_layout)
-    #     self.apply_layout_action.triggered.connect(self.apply_layout)
-    #     self.store_layout_action.triggered.connect(self.store_layout)
-    #     self.apply_and_store_layout_action.triggered.connect(
-    #             self.apply_and_store_layout)
-    #     self.reset_layout_action.triggered.connect(self.reset_layout)
-    #     self.about_action.triggered.connect(self.about_dialog)
+    def connect_toolbar(self):
+        """
+        Connect the toolbar signals with internal slots.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.toolbar.pull_action.triggered.connect(
+            self.pull_layouts)
+        self.toolbar.create_keyboard_action.triggered.connect(
+            self.create_layout)
+        self.toolbar.clone_keyboard_action.triggered.connect(
+            self.clone_layout)
+        self.toolbar.delete_keyboard_action.triggered.connect(
+            self.delete_layout)
+        self.toolbar.apply_keyboard_action.triggered.connect(
+            self.apply_layout)
+        self.toolbar.store_keyboard_action.triggered.connect(
+            self.store_layout)
+        self.toolbar.apply_and_store_keyboard_action.triggered.connect(
+                self.apply_and_store_layout)
+        self.toolbar.reset_keyboard_action.triggered.connect(
+            self.reset_layout)
+        self.toolbar.about_action.triggered.connect(
+            self.about_dialog)
 
 
 if __name__ == "__main__":
