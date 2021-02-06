@@ -28,7 +28,7 @@ class SelectionModel(QStandardItemModel):
             self.tr("Keyboard")))
         self.origins = dict()
 
-    def add_origin(self, origin: Origin, origin_name: str):
+    def add_origin(self, origin: Origin):
         """
         Add an origin to the model.
 
@@ -44,7 +44,7 @@ class SelectionModel(QStandardItemModel):
         None.
 
         """
-        self.origins[origin] = QStandardItem(origin_name)
+        self.origins[origin] = QStandardItem(origin.value)
         self.origins[origin].setEditable(False)
         self.invisibleRootItem().appendRow(self.origins[origin])
 
