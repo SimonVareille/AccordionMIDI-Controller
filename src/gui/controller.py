@@ -8,8 +8,11 @@ import sys
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from toolbar import ToolBar
-from keyboardselection import KeyboardSelection
+from core import ControllerCore
+from core.origin import Origin
+
+from .toolbar import ToolBar
+from .keyboardselection import KeyboardSelection
 
 
 class ControllerGUI(QMainWindow):
@@ -21,17 +24,22 @@ class ControllerGUI(QMainWindow):
         self.setMinimumSize(QSize(640, 480))
         self.setWindowTitle("Controller")
 
+        # Controller core
+        self.controller = ControllerCore()
+
         # Tool bar
 
         self.toolbar = ToolBar(self)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
         # self.connect_toolbar()
 
-        # Keybard selection dock
+        # Keyboard selection dock
         self.keyboard_selection = KeyboardSelection(self)
         self.keyboard_selection.setAllowedAreas(
             Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.keyboard_selection)
+
+        self.populate_keyboard_selection_model()
 
         self.statusBar().showMessage(self.tr("Initialization done"))
 
@@ -63,9 +71,18 @@ class ControllerGUI(QMainWindow):
         self.toolbar.about_action.triggered.connect(
             self.about_dialog)
 
+    def populate_keyboard_selection_model(self):
+        """
+        Populate the model.
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    main_win = ControllerGUI()
-    main_win.show()
-    sys.exit(app.exec_())
+        Returns
+        -------
+        None.
+
+        """
+        keyboards = self.controller.get_known_keyboards()
+        for origin, lst_kbds in keyboards.items():
+            self.keyboard_selection.selection_model.add_origin(origin)
+            for kbd in lst_kbds:
+                self.keyboard_selection.selection_model.add_keyboard(
+                    origin, kbd)
