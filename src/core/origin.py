@@ -14,4 +14,4 @@ class Origin(Enum):
         - Arduino
     """
 
-    Arduino = 1
+    Arduino = "Arduino"
