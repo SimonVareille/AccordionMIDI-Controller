@@ -21,12 +21,19 @@ class ControllerGUI(QMainWindow):
         self.setMinimumSize(QSize(640, 480))
         self.setWindowTitle("Controller")
 
+        # Tool bar
+
         self.toolbar = ToolBar(self)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
-
         # self.connect_toolbar()
 
-        self.statusBar().showMessage("Initialization done")
+        # Keybard selection dock
+        self.keyboard_selection = KeyboardSelection(self)
+        self.keyboard_selection.setAllowedAreas(
+            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.keyboard_selection)
+
+        self.statusBar().showMessage(self.tr("Initialization done"))
 
     def connect_toolbar(self):
         """
