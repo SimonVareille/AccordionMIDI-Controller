@@ -57,14 +57,17 @@ class NoteData(MidiData):
         self._pitch = None
         self._velocity = None
 
-        _verify_channel(channel)
-        self._channel = channel
+        if channel:
+            _verify_channel(channel)
+            self._channel = channel
 
-        _verify_pitch(pitch)
-        self._pitch = pitch
+        if pitch:
+            _verify_pitch(pitch)
+            self._pitch = pitch
 
-        _verify_velocity(velocity)
-        self._velocity = velocity
+        if velocity:
+            _verify_velocity(velocity)
+            self._velocity = velocity
 
     def __eq__(self, o):
         return self._channel == o._channel and\
@@ -119,11 +122,13 @@ class ProgramData(MidiData):
         self._channel = None
         self._number = None
 
-        _verify_channel(channel)
-        self._channel = channel
+        if channel:
+            _verify_channel(channel)
+            self._channel = channel
 
-        _verify_number(number)
-        self._number = number
+        if number:
+            _verify_number(number)
+            self._number = number
 
     def __eq__(self, o):
         return self._channel == o._channel and\
@@ -172,14 +177,17 @@ class ControlData(MidiData):
         self._number = None
         self._value = None
 
-        _verify_channel(channel)
-        self._channel = channel
+        if channel:
+            _verify_channel(channel)
+            self._channel = channel
 
-        _verify_number(number)
-        self._number = number
+        if number:
+            _verify_number(number)
+            self._number = number
 
-        _verify_value(value)
-        self._value = value
+        if value:
+            _verify_value(value)
+            self._value = value
 
     def __eq__(self, o):
         return self._channel == o._channel and\
