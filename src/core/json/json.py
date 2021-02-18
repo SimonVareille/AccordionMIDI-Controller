@@ -10,30 +10,35 @@ from core.keyboard import Keyboard, Left96ButtonKeyboard,\
 class JsonFile:
     """Access keyboard's data stored in JSON file."""
 
-    def __init__(self, filename: str = "", keyboard: Keyboard = None):
+    def __init__(self, filename: str = ""):
         self.filename = filename
-        self.keyboard = keyboard
 
-    def load(self):
+    def load(self) -> Keyboard:
         """
         Read the file containing the keyboard in JSON format.
 
         Returns
         -------
-        None.
+        Keyboard
+            The loaded keyboard.
 
         """
         with open(self.filename, "r") as file:
             try:
-                self.keyboard = keyboard_from_dict(json.load(file))
+                return keyboard_from_dict(json.load(file))
             except KeyError as err:
                 raise ValueError(
                     f"The file '{self.filename}' doesn't contain a valid "
                     "keyboard.") from err
 
-    def save(self):
+    def save(self, kbd: Keyboard):
         """
         Write into the file the keyboard in JSON format.
+
+        Parameters
+        ----------
+        kbd : Keyboard
+            The keyboard to save.
 
         Returns
         -------
@@ -41,7 +46,7 @@ class JsonFile:
 
         """
         with open(self.filename, "w") as file:
-            json.dump(keyboard_to_dict(self.keyboard), file)
+            json.dump(keyboard_to_dict(kbd), file)
 
 
 def keyboard_to_dict(kbd: Keyboard) -> Dict:
@@ -51,7 +56,7 @@ def keyboard_to_dict(kbd: Keyboard) -> Dict:
     Parameters
     ----------
     kbd : Keyboard
-        The keyboard o convert.
+        The keyboard to convert.
 
     Returns
     -------
