@@ -2,61 +2,57 @@
 
 Contains everything a UI should need.
 """
+import os
 from typing import Dict, List
 
 from .origin import Origin
 from .arduino import Arduino, midiio
 from .keyboard import Keyboard, MidiData
+from .json import JsonFile
 
 
 class ControllerCore:
     """Core of the controller."""
 
     def __init__(self):
-        self.keyboards = dict()
-        """Keep modified keyboards.
-        dict[Origin, (Keyboard, History)]
+        self.keyboards = []
+        """Keep opened keyboards.
+        List[KeyboardState]
         """
         self.arduino = Arduino()
         self.history = History()
 
-    def rename_keyboard(self, kbd: Keyboard, new_name: str):
+    def open(self, filename: str) -> 'KeyboardState':
         """
-        Rename the given keyboard.
+        Open a file containig a keyboard.
 
         Parameters
         ----------
-        kbd : Keyboard
-            The keyboard to rename.
-        new_name : str
-            The new name.
+        filename : str
+            The file to open.
 
         Returns
         -------
-        None.
+        KeyboardState
+            The openend keyboard.
 
         """
-        self.history.execute(RenameKeyboard(kbd, new_name))
+        for kbd in self.keyboards:
+            if os.path.samefile(kbd.storage.filename, filename):
+                return kbd
 
-    def set_keyboard_data(self, kbd: Keyboard, index, data: MidiData):
-        """
-        Set the keyboard's data identified by index.
+        kbd_state = KeyboardState()
+        _, ext = os.path.splitext(filename)
 
-        Parameters
-        ----------
-        kbd : Keyboard
-            The keyboard to modify.
-        index : undefined
-            The index of the data to set.
-        data : MidiData
-            The data to set.
+        if ext == '.json':
+            kbd_state.storage = JsonFile(filename)
+        else:
+            raise UnknownFileTypeError(f"The file '{filename}' is of unknown "
+                                       "type.")
 
-        Returns
-        -------
-        None.
-
-        """
-        self.history.execute(SetKeyboardData(kbd, index, data))
+        kbd_state.load()
+        self.keyboards.append(kbd_state)
+        return kbd_state
 
     def get_known_keyboards(self, origin: List[Origin] = None
                             ) -> Dict[Origin, List[Keyboard]]:
@@ -91,8 +87,93 @@ class ControllerCore:
         return result
 
 
-class History():
-    """Keep an history of every action performed."""
+class KeyboardState:
+    """Keep every infos about a keyboard."""
+
+    def __init__(self, kbd=None):
+        self.history = History()
+        self.keyboard = kbd
+        self.storage = None
+
+    def load(self):
+        """
+        Load keyboard from storage.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.keyboard = self.storage.load()
+
+    def save(self):
+        """
+        Save keyboard to storage.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.storage.save(self.keyboard)
+
+    def store(self):
+        """
+        Store the keyboard of the Arduino.
+
+        Returns
+        -------
+        None.
+
+        """
+
+    def set_as_current(self):
+        """
+        Set the keyboard as current on the Arduino.
+
+        Returns
+        -------
+        None.
+
+        """
+
+    def rename(self, new_name: str):
+        """
+        Rename the keyboard.
+
+        Parameters
+        ----------
+        new_name : str
+            The new name.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.history.execute(RenameKeyboard(self.keyboard, new_name))
+
+    def set_keyboard_data(self, index, data: MidiData):
+        """
+        Set the keyboard's data identified by index.
+
+        Parameters
+        ----------
+        index : undefined
+            The index of the data to set.
+        data : MidiData
+            The data to set.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.history.execute(SetKeyboardData(self.keyboard, index, data))
+
+
+class History:
+    """Class to keep an history of every action performed."""
 
     def __init__(self):
         self._commands = list()
@@ -168,3 +249,7 @@ class SetKeyboardData():
 
     def undo(self):
         self.kbd.set_data(self.index, self.prev_data)
+
+
+class UnknownFileTypeError(Exception):
+    pass
