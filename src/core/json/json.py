@@ -28,7 +28,7 @@ class JsonFile:
                 return keyboard_from_dict(json.load(file))
             except KeyError as err:
                 raise ValueError(
-                    f"The file '{self.filename}' doesn't contain a valid "
+                    f"The file '{self.filename}' doesn't contain a valid JSON "
                     "keyboard.") from err
 
     def save(self, kbd: Keyboard):
