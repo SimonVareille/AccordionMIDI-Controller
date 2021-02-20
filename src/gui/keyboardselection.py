@@ -1,24 +1,37 @@
-"""Keyboard selection widget."""
-from PyQt5.QtWidgets import QDockWidget, QTreeView
+"""Keyboard selection widgets."""
+
+import os
+
+from PyQt5.QtCore import QDir
+from PyQt5.QtWidgets import QDockWidget, QTreeView, QFileSystemModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from core.origin import Origin
 from core.keyboard import Keyboard
 
 
-class KeyboardSelection(QDockWidget):
-    """Dock for displaying the list of known keyboard, from every origin."""
+class KeyboardFileSelection(QDockWidget):
+    """Dock for displaying the directories containing keyboards."""
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.setWindowTitle(self.tr("Keyboard Selection"))
+        self.setWindowTitle(self.tr("File Selection"))
         self.tree_view = QTreeView(self)
         self.setWidget(self.tree_view)
 
-        self.selection_model = SelectionModel()
+        self.extensions = ["*.json"]
+
+        self.selection_model = QFileSystemModel(self.tree_view)
+        self.selection_model.setRootPath(os.getcwd())
+        self.selection_model.setFilter(QDir.Files | QDir.AllDirs
+                                       | QDir.NoDotAndDotDot)
+        self.selection_model.setNameFilters(self.extensions)
         self.tree_view.setModel(self.selection_model)
 
+        for i in range(1, self.selection_model.columnCount()):
+            self.tree_view.hideColumn(i)
 
-class SelectionModel(QStandardItemModel):
+
+class ArduinoSelectionModel(QStandardItemModel):
     """Provide a data model for the keyboard selection."""
 
     def __init__(self, *args, **kwargs):
