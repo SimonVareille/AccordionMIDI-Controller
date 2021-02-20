@@ -1,0 +1,17 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/power-off-solid.svg</file>
+    <file>icons/folder-symbol.svg</file>
+    <file>icons/google-drive-file.svg</file>
+    <file>icons/download-button.svg</file>
+    <file>icons/round-add-button.svg</file>
+    <file>icons/copy-content.svg</file>
+    <file>icons/round-delete-button.svg</file>
+    <file>icons/send-button.svg</file>
+    <file>icons/save-button.svg</file>
+    <file>icons/upload-button.svg</file>
+    <file>icons/undo-button.svg</file>
+    <file>icons/help.svg</file>
+</qresource>
+</RCC>
+<!--pyrcc5 -o gui/resources.py gui/resources.qrc-->
