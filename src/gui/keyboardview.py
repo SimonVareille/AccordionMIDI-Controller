@@ -15,10 +15,11 @@ class CurrentKeyboardsWidget(QWidget):
 
         self.controller = controller
 
-        self.tabs = []
         self.layout = QVBoxLayout(self)
         self.tab_widget = QTabWidget(self)
+
         self.tab_widget.setTabsClosable(True)
+        self.tab_widget.setMovable(True)
 
         self.tab_widget.tabCloseRequested.connect(self.close_tab)
 
@@ -45,7 +46,6 @@ class CurrentKeyboardsWidget(QWidget):
                                os.path.basename(kbd_state.storage.filename)
                                + ('*' if not kbd_state.is_saved else ''))
         new_tab.changes_made.connect(self.keyboard_changed)
-        self.tabs.append(new_tab)
         self.tab_widget.setCurrentWidget(new_tab)
 
     def display_keyboard(self, kbd_state):
@@ -64,7 +64,8 @@ class CurrentKeyboardsWidget(QWidget):
         None.
 
         """
-        for tab in self.tabs:
+        for i in range(self.tab_widget.count()):
+            tab = self.tab_widget.widget(i)
             if tab.keyboard_state == kbd_state:
                 self.tab_widget.setCurrentWidget(tab)
                 return
@@ -120,7 +121,6 @@ class CurrentKeyboardsWidget(QWidget):
             elif result == QMessageBox.Yes:
                 self.save(index)
         self.controller.close(kbd_state)
-        self.tabs.remove(tab)
         self.tab_widget.removeTab(index)
 
 class KeyboardView(QWidget):
