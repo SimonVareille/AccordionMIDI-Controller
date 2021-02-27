@@ -94,6 +94,7 @@ class KeyboardState:
         self.history = History()
         self.keyboard = kbd
         self.storage = None
+        self.is_saved = False
 
     def load(self):
         """
@@ -105,6 +106,7 @@ class KeyboardState:
 
         """
         self.keyboard = self.storage.load()
+        self.is_saved = True
 
     def save(self):
         """
@@ -116,6 +118,7 @@ class KeyboardState:
 
         """
         self.storage.save(self.keyboard)
+        self.is_saved = True
 
     def store(self):
         """
@@ -151,7 +154,9 @@ class KeyboardState:
         None.
 
         """
+        print("new name:", new_name)
         self.history.execute(RenameKeyboard(self.keyboard, new_name))
+        self.is_saved = False
 
     def set_keyboard_data(self, index, data: MidiData):
         """
@@ -170,6 +175,7 @@ class KeyboardState:
 
         """
         self.history.execute(SetKeyboardData(self.keyboard, index, data))
+        self.is_saved = False
 
 
 class History:
