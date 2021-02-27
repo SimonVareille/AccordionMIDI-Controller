@@ -1,5 +1,6 @@
 """Widgets displaying the keyboards."""
 import os
+# from functools import partial
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,\
@@ -62,7 +63,6 @@ class CurrentKeyboardsWidget(QWidget):
     def keyboard_changed(self):
         index = self.tab_widget.indexOf(self.sender())
         kbd_state = self.sender().keyboard_state
-        print("pass")
         self.tab_widget.setTabText(index,
                                    os.path.basename(kbd_state.storage.filename)
                                    + ('*' if not kbd_state.is_saved else ''))
@@ -89,8 +89,14 @@ class KeyboardView(QWidget):
 
     def connect_signals(self):
         self.name_edit.editingFinished.connect(self.name_edited)
+        self.keyboard_state.keyboard_changed.connect(self.update)
 
     def name_edited(self):
         if self.name_edit.text() != self.keyboard_state.keyboard.name:
             self.keyboard_state.rename(self.name_edit.text())
             self.changes_made.emit()
+
+    def update(self):
+        if self.name_edit.text() != self.keyboard_state.keyboard.name:
+            self.name_edit.setText(self.keyboard_state.keyboard.name)
+        self.changes_made.emit()
