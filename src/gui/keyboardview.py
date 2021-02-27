@@ -46,6 +46,7 @@ class CurrentKeyboardsWidget(QWidget):
                                + ('*' if not kbd_state.is_saved else ''))
         new_tab.changes_made.connect(self.keyboard_changed)
         self.tabs.append(new_tab)
+        self.tab_widget.setCurrentWidget(new_tab)
 
     def display_keyboard(self, kbd_state):
         """
