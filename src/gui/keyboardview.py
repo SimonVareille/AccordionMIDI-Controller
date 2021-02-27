@@ -58,6 +58,10 @@ class CurrentKeyboardsWidget(QWidget):
         None.
 
         """
+        for tab in self.tabs:
+            if tab.keyboard_state == kbd_state:
+                self.tab_widget.setCurrentWidget(tab)
+                return
         self.add_keyboard(kbd_state)
 
     def keyboard_changed(self):
