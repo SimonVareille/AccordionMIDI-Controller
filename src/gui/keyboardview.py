@@ -4,18 +4,23 @@ import os
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,\
-    QLabel, QLineEdit
+    QLabel, QLineEdit, QFileDialog, QMessageBox
 
 
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, controller):
         super().__init__(parent)
+
+        self.controller = controller
 
         self.tabs = []
         self.layout = QVBoxLayout(self)
         self.tab_widget = QTabWidget(self)
+        self.tab_widget.setTabsClosable(True)
+
+        self.tab_widget.tabCloseRequested.connect(self.close_tab)
 
         self.layout.addWidget(self.tab_widget)
         self.setLayout(self.layout)
@@ -70,6 +75,52 @@ class CurrentKeyboardsWidget(QWidget):
         self.tab_widget.setTabText(index,
                                    os.path.basename(kbd_state.storage.filename)
                                    + ('*' if not kbd_state.is_saved else ''))
+
+    def save(self, index = None):
+        if index:
+            tab = self.tab_widget.widget(index)
+        else:
+            tab = self.tab_widget.currentWidget()
+        if tab.keyboard_state.storage and tab.keyboard_state.storage.filename:
+            tab.keyboard_state.save()
+        else:
+            self.save_as()
+
+    def save_as(self):
+        tab = self.tab_widget.currentWidget()
+        if tab.keyboard_state.storage and tab.keyboard_state.storage.filename:
+            current_name = tab.keyboard_state.storage.filename
+        else:
+            current_name = ""
+        filename = QFileDialog.getSaveFileName(
+            self,
+            self.tr("Save Keyboard as"),
+            current_name,
+            self.tr("Keyboard Files (*.json)"))[0]
+        self.controller.save_as(tab.keyboard_state, filename)
+
+    def close_tab(self, index):
+        tab = self.tab_widget.widget(index)
+        kbd_state = tab.keyboard_state
+        if kbd_state.storage and kbd_state.storage.filename:
+            current_name = os.path.basename(kbd_state.storage.filename)
+        if not kbd_state.is_saved:
+            result = QMessageBox.question(
+                self,
+                self.tr("Unsaved changes"),
+                self.tr(f"<b>{current_name}</b> has been modified.<br/>\
+                        Would you like to save the changes?"),
+                QMessageBox.StandardButtons(QMessageBox.Yes
+                                            | QMessageBox.No
+                                            | QMessageBox.Cancel),
+                QMessageBox.Cancel)
+            if result == QMessageBox.Cancel:
+                return
+            elif result == QMessageBox.Yes:
+                self.save(index)
+        self.controller.close(kbd_state)
+        self.tabs.remove(tab)
+        self.tab_widget.removeTab(index)
 
 class KeyboardView(QWidget):
     """Widget containing everything a keyboard need."""

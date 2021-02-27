@@ -55,6 +55,47 @@ class ControllerCore:
         self.keyboards.append(kbd_state)
         return kbd_state
 
+    def save_as(self, kbd_state: 'KeyboardState', filename: str):
+        """
+        Save a keyboard with filename and corresponding file format.
+
+        Parameters
+        ----------
+        kbd_state : 'KeyboardState'
+            The keyboard to save.
+        filename : str
+            The file.
+
+        Returns
+        -------
+        None.
+
+        """
+        _, ext = os.path.splitext(filename)
+
+        if ext == '.json':
+            kbd_state.storage = JsonFile(filename)
+        else:
+            raise UnknownFileTypeError(f"The file '{filename}' is of unknown "
+                                       "type.")
+        kbd_state.save()
+
+    def close(self, kbd_state: 'KeyboardState'):
+        """
+        Close the given keyboard.
+
+        Parameters
+        ----------
+        kbd_state : 'KeyboardState'
+            The keyboard to close.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.keyboards.remove(kbd_state)
+
     def get_known_keyboards(self, origin: List[Origin] = None
                             ) -> Dict[Origin, List[Keyboard]]:
         """

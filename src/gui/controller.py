@@ -40,6 +40,8 @@ class ControllerGUI(QMainWindow):
         file_menu = menubar.addMenu(self.tr('&File'))
         file_menu.addAction(self.actions.new)
         file_menu.addAction(self.actions.open)
+        file_menu.addAction(self.actions.save)
+        file_menu.addAction(self.actions.save_as)
         file_menu.addSeparator()
         file_menu.addAction(self.actions.exit)
 
@@ -56,7 +58,7 @@ class ControllerGUI(QMainWindow):
 
         # self.populate_keyboard_selection_model()
 
-        self.current_keyboards = CurrentKeyboardsWidget(self)
+        self.current_keyboards = CurrentKeyboardsWidget(self, self.controller)
         self.setCentralWidget(self.current_keyboards)
 
         self.connect_actions()
@@ -74,6 +76,8 @@ class ControllerGUI(QMainWindow):
         """
         self.actions.exit.triggered.connect(self.close)
         self.actions.open.triggered.connect(self.open_file_dialog)
+        self.actions.save.triggered.connect(self.current_keyboards.save)
+        self.actions.save_as.triggered.connect(self.current_keyboards.save_as)
         # self.actions.pull.triggered.connect(
         #     self.pull_layouts)
         # self.actions.create_keyboard.triggered.connect(
@@ -157,12 +161,21 @@ class Actions(QObject):
             owner)
         self.open.setShortcut('Ctrl+O')
         self.open.setStatusTip(self.tr('Open a file'))
+        # Save
         self.save = QAction(
             QIcon(':/icons/save-button.svg'),
             self.tr('&Save'),
             owner)
         self.save.setShortcut('Ctrl+S')
         self.save.setStatusTip(self.tr('Save a file'))
+        # Save as
+        self.save_as = QAction(
+            QIcon(':/icons/save-button.svg'),
+            self.tr('&Save as'),
+            owner)
+        self.save_as.setShortcut('Ctrl+Shift+S')
+        self.save_as.setStatusTip(
+            self.tr('Save a file currently edited as another name'))
         # New
         self.new = QAction(
             QIcon(':/icons/google-drive-file.svg'),
