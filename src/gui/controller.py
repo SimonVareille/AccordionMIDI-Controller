@@ -14,6 +14,7 @@ from core import ControllerCore
 
 from .toolbar import ToolBar
 from .keyboardselection import KeyboardFileSelection
+from .keyboardview import CurrentKeyboardsWidget
 import gui.resources
 
 
@@ -54,6 +55,9 @@ class ControllerGUI(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.keyboard_selection)
 
         # self.populate_keyboard_selection_model()
+
+        self.current_keyboards = CurrentKeyboardsWidget(self)
+        self.setCentralWidget(self.current_keyboards)
 
         self.connect_actions()
 
@@ -115,7 +119,7 @@ class ControllerGUI(QMainWindow):
             self.base_path,
             self.tr("Keyboard Files (*.json)"))[0]
         keyboard_state = self.controller.open(filename)
-        # TODO: Create a new pannel with the returned keyboard_state
+        self.current_keyboards.display_keyboard(keyboard_state)
 
     def populate_keyboard_selection_model(self):
         """
@@ -153,6 +157,12 @@ class Actions(QObject):
             owner)
         self.open.setShortcut('Ctrl+O')
         self.open.setStatusTip(self.tr('Open a file'))
+        self.save = QAction(
+            QIcon(':/icons/save-button.svg'),
+            self.tr('&Save'),
+            owner)
+        self.save.setShortcut('Ctrl+S')
+        self.save.setStatusTip(self.tr('Save a file'))
         # New
         self.new = QAction(
             QIcon(':/icons/google-drive-file.svg'),
