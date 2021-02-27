@@ -9,6 +9,7 @@ from .origin import Origin
 from .arduino import Arduino, midiio
 from .keyboard import Keyboard, MidiData
 from .json import JsonFile
+from .notifications import Notification
 
 
 class ControllerCore:
@@ -95,6 +96,7 @@ class KeyboardState:
         self.keyboard = kbd
         self.storage = None
         self.is_saved = False
+        self.keyboard_changed = Notification()
 
     def load(self):
         """
@@ -107,6 +109,7 @@ class KeyboardState:
         """
         self.keyboard = self.storage.load()
         self.is_saved = True
+        self.keyboard_changed()
 
     def save(self):
         """
@@ -119,6 +122,7 @@ class KeyboardState:
         """
         self.storage.save(self.keyboard)
         self.is_saved = True
+        self.keyboard_changed()
 
     def store(self):
         """
@@ -157,6 +161,7 @@ class KeyboardState:
         print("new name:", new_name)
         self.history.execute(RenameKeyboard(self.keyboard, new_name))
         self.is_saved = False
+        self.keyboard_changed()
 
     def set_keyboard_data(self, index, data: MidiData):
         """
@@ -176,6 +181,7 @@ class KeyboardState:
         """
         self.history.execute(SetKeyboardData(self.keyboard, index, data))
         self.is_saved = False
+        self.keyboard_changed()
 
 
 class History:
