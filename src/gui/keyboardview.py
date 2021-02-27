@@ -40,7 +40,7 @@ class CurrentKeyboardsWidget(QWidget):
         None.
 
         """
-        new_tab = KeyboardView(kbd_state)
+        new_tab = KeyboardView(kbd_state, self.controller)
 
         self.tab_widget.addTab(new_tab,
                                os.path.basename(kbd_state.storage.filename)
@@ -72,6 +72,14 @@ class CurrentKeyboardsWidget(QWidget):
         self.add_keyboard(kbd_state)
 
     def keyboard_changed(self):
+        """
+        Update the view.
+
+        Returns
+        -------
+        None.
+
+        """
         index = self.tab_widget.indexOf(self.sender())
         kbd_state = self.sender().keyboard_state
         self.tab_widget.setTabText(index,
@@ -83,23 +91,14 @@ class CurrentKeyboardsWidget(QWidget):
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        if tab.keyboard_state.storage and tab.keyboard_state.storage.filename:
-            tab.keyboard_state.save()
-        else:
-            self.save_as()
+        tab.save()
 
-    def save_as(self):
-        tab = self.tab_widget.currentWidget()
-        if tab.keyboard_state.storage and tab.keyboard_state.storage.filename:
-            current_name = tab.keyboard_state.storage.filename
+    def save_as(self, index = None):
+        if index:
+            tab = self.tab_widget.widget(index)
         else:
-            current_name = ""
-        filename = QFileDialog.getSaveFileName(
-            self,
-            self.tr("Save Keyboard as"),
-            current_name,
-            self.tr("Keyboard Files (*.json)"))[0]
-        self.controller.save_as(tab.keyboard_state, filename)
+            tab = self.tab_widget.currentWidget()
+        tab.save_as()
 
     def close_tab(self, index):
         tab = self.tab_widget.widget(index)
@@ -128,9 +127,12 @@ class KeyboardView(QWidget):
 
     changes_made = pyqtSignal()
 
-    def __init__(self, kbd_state):
+    def __init__(self, kbd_state, controller):
         super().__init__()
+
+        self.controller = controller
         self.keyboard_state = kbd_state
+
         self.main_layout = QVBoxLayout(self)
 
         self.name_layout = QHBoxLayout(self)
@@ -139,6 +141,7 @@ class KeyboardView(QWidget):
         self.name_layout.addWidget(self.name_edit)
 
         self.main_layout.addLayout(self.name_layout)
+
         self.setLayout(self.main_layout)
 
         self.connect_signals()
@@ -156,3 +159,26 @@ class KeyboardView(QWidget):
         if self.name_edit.text() != self.keyboard_state.keyboard.name:
             self.name_edit.setText(self.keyboard_state.keyboard.name)
         self.changes_made.emit()
+
+    def save(self):
+        if(self.keyboard_state.storage and
+           self.keyboard_state.storage.filename):
+            self.keyboard_state.save()
+        else:
+            self.save_as()
+
+    def save_as(self):
+        if(self.keyboard_state.storage and
+           self.keyboard_state.storage.filename):
+            current_name = self.keyboard_state.storage.filename
+        else:
+            current_name = ""
+        filename = QFileDialog.getSaveFileName(
+            self,
+            self.tr("Save Keyboard as"),
+            current_name,
+            self.tr("Keyboard Files (*.json)"))[0]
+        self.controller.save_as(self.keyboard_state, filename)
+
+
+class 
