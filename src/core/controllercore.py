@@ -4,6 +4,7 @@ Contains everything a UI should need.
 """
 import os
 from typing import Dict, List
+from copy import deepcopy
 
 from .origin import Origin
 from .arduino import Arduino, midiio
@@ -199,10 +200,10 @@ class KeyboardState:
         None.
 
         """
-        print("new name:", new_name)
-        self.history.execute(RenameKeyboard(self.keyboard, new_name))
-        self.is_saved = False
-        self.keyboard_changed()
+        if new_name != self.keyboard.name:
+            self.history.execute(RenameKeyboard(self.keyboard, new_name))
+            self.is_saved = False
+            self.keyboard_changed()
 
     def set_keyboard_data(self, index, data: MidiData):
         """
@@ -220,9 +221,10 @@ class KeyboardState:
         None.
 
         """
-        self.history.execute(SetKeyboardData(self.keyboard, index, data))
-        self.is_saved = False
-        self.keyboard_changed()
+        if data != self.keyboard.get_data(index):
+            self.history.execute(SetKeyboardData(self.keyboard, index, data))
+            self.is_saved = False
+            self.keyboard_changed()
 
 
 class History:
@@ -294,8 +296,8 @@ class SetKeyboardData():
     def __init__(self, kbd, index, data):
         self.kbd = kbd
         self.index = index
-        self.prev_data = self.kbd.get_data(index)
-        self.data = data
+        self.prev_data = deepcopy(self.kbd.get_data(index))
+        self.data = deepcopy(data)
 
     def execute(self):
         self.kbd.set_data(self.index, self.data)
