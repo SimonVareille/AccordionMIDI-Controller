@@ -24,7 +24,7 @@ class ControllerGUI(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setMinimumSize(QSize(640, 480))
+        self.setMinimumSize(QSize(1600, 600))
         self.setWindowTitle("Controller")
 
         self.base_path = os.getcwd()
