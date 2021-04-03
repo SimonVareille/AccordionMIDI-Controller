@@ -6,6 +6,8 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,\
     QLabel, QLineEdit, QFileDialog, QMessageBox
 
+from core.keyboard import Left96ButtonKeyboard, Right81ButtonKeyboard
+from .keyboardgraphicalview import Right81ButtonKeyboardGraphicalView
 
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
@@ -142,6 +144,16 @@ class KeyboardView(QWidget):
 
         self.main_layout.addLayout(self.name_layout)
 
+        if isinstance(kbd_state.keyboard, Right81ButtonKeyboard):
+            self.keyboard_zone = Right81ButtonKeyboardGraphicalView(self,
+                                                                    kbd_state)
+        elif isinstance(kbd_state.keyboard, Left96ButtonKeyboard):
+            raise NotImplementedError()
+        else:
+            raise UnknownKeyboardTypeError(
+                f"Unknown keyboard type '{type(kbd_state.keyboard)}'.")
+        self.main_layout.addWidget(self.keyboard_zone)
+
         self.setLayout(self.main_layout)
 
         self.connect_signals()
@@ -181,4 +193,5 @@ class KeyboardView(QWidget):
         self.controller.save_as(self.keyboard_state, filename)
 
 
-class 
+class UnknownKeyboardTypeError(Exception):
+    pass
