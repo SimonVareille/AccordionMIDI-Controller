@@ -13,5 +13,10 @@
     <file>icons/undo-button.svg</file>
     <file>icons/help.svg</file>
 </qresource>
+<qresource prefix="/right-81-buttons-svg">
+    <file alias="background.svg">svg/right-81-buttons-background.svg</file>
+    <file alias="full.svg">svg/right-81-buttons-full.svg</file>
+    <file alias="button.svg">svg/right-81-button.svg</file>
+</qresource>
 </RCC>
 <!--pyrcc5 -o gui/resources.py gui/resources.qrc-->
