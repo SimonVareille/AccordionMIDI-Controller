@@ -234,7 +234,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
 
 class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
-    """Represent a 81 rigt button keyboard's DAO using MIDI."""
+    """Represent a 81 right button keyboard's DAO using MIDI."""
 
     def __init__(self):
         super().__init__()
