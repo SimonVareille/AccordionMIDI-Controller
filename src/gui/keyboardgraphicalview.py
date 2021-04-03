@@ -228,7 +228,7 @@ class Right81ButtonKeyboardGraphicalView(KeyboardGraphicalView):
         # First row
         for i in range(16):
             self.buttons_svg.append(new_button(
-                75 + button_gap * i, 240, i))
+                75 + button_gap * i, 240, i+1))
         # Second row
         for i in range(17):
             self.buttons_svg.append(new_button(
@@ -253,7 +253,7 @@ class Right81ButtonKeyboardGraphicalView(KeyboardGraphicalView):
             self.buttons_svg[i].update()
 
     def button_changed(self, index, midi_data):
-        self.keyboard_state.set_keyboard_data(index+1, midi_data)
+        self.keyboard_state.set_keyboard_data(index, midi_data)
 
 
 class SvgButton(QGraphicsObject):
@@ -328,7 +328,7 @@ class ButtonDialog(QDialog):
                                    self.tr("Control")])
         self.button_type.currentIndexChanged.connect(self.button_type_changed)
 
-        self.center = NoteDataEditor()  # QVBoxLayout()
+        self.center = QWidget()  # NoteDataEditor()
 
         QBtn = QDialogButtonBox.Save | QDialogButtonBox.Cancel
 
@@ -361,11 +361,11 @@ class ButtonDialog(QDialog):
         self.midi_data = midi_data
         # self.center.removeItem(self.center.itemAt(0))
         if isinstance(midi_data, NoteData):
-            pass
-            #self.center.addLayout(self._create_note_layout())
-            # self.pitch_spin_box.setValue(midi_data.pitch)
-            # self.velocity_spin_box.setValue(midi_data.velocity)
-            # self.channel_spin_box.setValue(midi_data.channel)
+            center = NoteDataEditor()
+            # self.main_layout.replaceWidget(self.center, center)
+            # self.main_layout.removeWidget(self.center)
+            self.center.parentWidget().layout().replaceWidget(self.center, center)
+            self.center = center
         elif isinstance(midi_data, ProgramData):
             self.center.addLayout(self._create_program_layout())
         elif isinstance(midi_data, ControlData):
