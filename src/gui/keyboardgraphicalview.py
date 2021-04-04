@@ -1,5 +1,6 @@
 """Holds graphical representation of keyboards."""
 from copy import deepcopy
+import sip
 
 from PyQt5.QtCore import Qt, qFuzzyCompare, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsItem,\
@@ -320,19 +321,19 @@ class ButtonDialog(QDialog):
         self.setWindowTitle(self.tr("Edit Button"))
         self.setWindowModality(Qt.WindowModal)
 
-        self.main_layout = QVBoxLayout()
+        self.main_layout = QVBoxLayout(self)
 
-        self.button_type = QComboBox()
+        self.button_type = QComboBox(self)
         self.button_type.addItems([self.tr("Note"),
                                    self.tr("Program"),
                                    self.tr("Control")])
         self.button_type.currentIndexChanged.connect(self.button_type_changed)
 
-        self.center = QWidget()  # NoteDataEditor()
+        self.center = QWidget(self)  # NoteDataEditor()
 
         QBtn = QDialogButtonBox.Save | QDialogButtonBox.Cancel
 
-        self.button_box = QDialogButtonBox(QBtn)
+        self.button_box = QDialogButtonBox(QBtn, self)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
@@ -342,7 +343,20 @@ class ButtonDialog(QDialog):
         self.setLayout(self.main_layout)
 
     def button_type_changed(self, index):
-        print(index)
+        if index == 0:
+            # Note
+            center = NoteDataEditor(self)
+            self.main_layout.replaceWidget(self.center, center)
+            sip.delete(self.center)
+            self.center = center
+            if isinstance(self.midi_data, NoteData):
+                self.center.set_data(self.midi_data)
+        elif index == 1:
+            # Program
+            pass
+        elif index == 2:
+            # Control
+            pass
 
     def set_midi_data(self, midi_data):
         """
@@ -359,12 +373,11 @@ class ButtonDialog(QDialog):
 
         """
         self.midi_data = midi_data
-        # self.center.removeItem(self.center.itemAt(0))
         if isinstance(midi_data, NoteData):
-            center = NoteDataEditor()
-            # self.main_layout.replaceWidget(self.center, center)
-            # self.main_layout.removeWidget(self.center)
-            self.center.parentWidget().layout().replaceWidget(self.center, center)
+            pass
+            center = NoteDataEditor(self)
+            self.main_layout.replaceWidget(self.center, center)
+            sip.delete(self.center)
             self.center = center
         elif isinstance(midi_data, ProgramData):
             self.center.addLayout(self._create_program_layout())
@@ -394,13 +407,13 @@ class NoteDataEditor(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pitch_widget = PitchEditor()
+        self.pitch_widget = PitchEditor(self)
 
-        self.velocity_widget = VelocityEditor()
+        self.velocity_widget = VelocityEditor(self)
 
-        self.channel_widget = ChannelEditor()
+        self.channel_widget = ChannelEditor(self)
 
-        self.form_layout = QFormLayout()
+        self.form_layout = QFormLayout(self)
         self.form_layout.addRow(self.tr("Pitch:"), self.pitch_widget)
         self.form_layout.addRow(self.tr("Velocity:"), self.velocity_widget)
         self.form_layout.addRow(self.tr("Channel:"), self.channel_widget)
@@ -420,8 +433,8 @@ class NoteDataEditor(QWidget):
 class PitchEditor(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        pitch_layout = QHBoxLayout()
-        self.pitch_spin_box = QSpinBox()
+        pitch_layout = QHBoxLayout(self)
+        self.pitch_spin_box = QSpinBox(self)
         self.pitch_spin_box.setRange(0, 127)
 
         # pitch_signature = KeySignatureSpinBox()
@@ -440,10 +453,10 @@ class PitchEditor(QWidget):
 class VelocityEditor(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        velocity_layout = QHBoxLayout()
-        self.velocity_spin_box = QSpinBox()
+        velocity_layout = QHBoxLayout(self)
+        self.velocity_spin_box = QSpinBox(self)
         self.velocity_spin_box.setRange(0, 127)
-        velocity_dial = QDial()
+        velocity_dial = QDial(self)
         velocity_dial.setRange(self.velocity_spin_box.minimum(),
                                self.velocity_spin_box.maximum())
         velocity_dial.valueChanged.connect(self.velocity_spin_box.setValue)
@@ -462,8 +475,8 @@ class VelocityEditor(QWidget):
 class ChannelEditor(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        channel_layout = QHBoxLayout()
-        self.channel_spin_box = QSpinBox()
+        channel_layout = QHBoxLayout(self)
+        self.channel_spin_box = QSpinBox(self)
         self.channel_spin_box.setRange(1, 16)
         channel_layout.addWidget(self.channel_spin_box)
         self.setLayout(channel_layout)
