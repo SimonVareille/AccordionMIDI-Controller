@@ -122,8 +122,9 @@ class ControllerGUI(QMainWindow):
             self.tr("Open Keyboard"),
             self.base_path,
             self.tr("Keyboard Files (*.json)"))[0]
-        keyboard_state = self.controller.open(filename)
-        self.current_keyboards.display_keyboard(keyboard_state)
+        if filename:
+            keyboard_state = self.controller.open(filename)
+            self.current_keyboards.display_keyboard(keyboard_state)
 
     def populate_keyboard_selection_model(self):
         """
