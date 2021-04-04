@@ -299,8 +299,17 @@ class SvgButton(QGraphicsObject):
 
     def update(self, *args):
         if self.show_midi_pitch:
-            if self.midi_data:
+            if isinstance(self.midi_data, NoteData):
                 self.button_text.setText(str(self.midi_data.pitch))
+                self.button_text.setBrush(Qt.black)
+            elif isinstance(self.midi_data, ProgramData):
+                self.button_text.setText(str(self.midi_data.number))
+                self.button_text.setBrush(Qt.blue)
+            elif isinstance(self.midi_data, ControlData):
+                self.button_text.setText(str(self.midi_data.number))
+                self.button_text.setBrush(Qt.green)
+
+            if self.midi_data:
                 self.center_text()
                 self.setToolTip(str(self.midi_data))
 
@@ -346,17 +355,21 @@ class ButtonDialog(QDialog):
         if index == 0:
             # Note
             center = NoteDataEditor(self)
-            self.main_layout.replaceWidget(self.center, center)
-            sip.delete(self.center)
-            self.center = center
             if isinstance(self.midi_data, NoteData):
-                self.center.set_data(self.midi_data)
+                center.set_data(self.midi_data)
         elif index == 1:
             # Program
-            pass
+            center = ProgramDataEditor(self)
+            if isinstance(self.midi_data, ProgramData):
+                center.set_data(self.midi_data)
         elif index == 2:
             # Control
-            pass
+            center = ControlDataEditor(self)
+            if isinstance(self.midi_data, ControlData):
+                center.set_data(self.midi_data)
+        self.main_layout.replaceWidget(self.center, center)
+        sip.delete(self.center)
+        self.center = center
 
     def set_midi_data(self, midi_data):
         """
@@ -374,15 +387,17 @@ class ButtonDialog(QDialog):
         """
         self.midi_data = midi_data
         if isinstance(midi_data, NoteData):
-            pass
             center = NoteDataEditor(self)
-            self.main_layout.replaceWidget(self.center, center)
-            sip.delete(self.center)
-            self.center = center
+            self.button_type.setCurrentIndex(0)
         elif isinstance(midi_data, ProgramData):
-            self.center.addLayout(self._create_program_layout())
+            center = ProgramDataEditor(self)
+            self.button_type.setCurrentIndex(1)
         elif isinstance(midi_data, ControlData):
-            self.center.addLayout(self._create_control_layout())
+            center = ControlDataEditor(self)
+            self.button_type.setCurrentIndex(2)
+        self.main_layout.replaceWidget(self.center, center)
+        sip.delete(self.center)
+        self.center = center
         self.center.set_data(midi_data)
 
     def accept(self):
@@ -428,6 +443,57 @@ class NoteDataEditor(QWidget):
         return NoteData(self.channel_widget.value(),
                         self.pitch_widget.value(),
                         self.velocity_widget.value())
+
+
+class ProgramDataEditor(QWidget):
+    """Widget to edit a ProgramData."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.number_widget = NumberEditor(self)
+
+        self.channel_widget = ChannelEditor(self)
+
+        self.form_layout = QFormLayout(self)
+        self.form_layout.addRow(self.tr("Number:"), self.number_widget)
+        self.form_layout.addRow(self.tr("Channel:"), self.channel_widget)
+        self.setLayout(self.form_layout)
+
+    def set_data(self, note_data):
+        self.number_widget.set_value(note_data.number)
+        self.channel_widget.set_value(note_data.channel)
+
+    def get_data(self):
+        return ProgramData(self.channel_widget.value(),
+                           self.number_widget.value())
+
+
+class ControlDataEditor(QWidget):
+    """Widget to edit a ControlData."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.number_widget = NumberEditor(self)
+
+        self.value_widget = VelocityEditor(self)
+
+        self.channel_widget = ChannelEditor(self)
+
+        self.form_layout = QFormLayout(self)
+        self.form_layout.addRow(self.tr("Number:"), self.number_widget)
+        self.form_layout.addRow(self.tr("Value:"), self.value_widget)
+        self.form_layout.addRow(self.tr("Channel:"), self.channel_widget)
+        self.setLayout(self.form_layout)
+
+    def set_data(self, note_data):
+        self.number_widget.set_value(note_data.number)
+        self.value_widget.set_value(note_data.value)
+        self.channel_widget.set_value(note_data.channel)
+
+    def get_data(self):
+        return ControlData(self.channel_widget.value(),
+                           self.number_widget.value(),
+                           self.value_widget.value())
 
 
 class PitchEditor(QWidget):
@@ -486,3 +552,19 @@ class ChannelEditor(QWidget):
 
     def value(self):
         return self.channel_spin_box.value()
+
+
+class NumberEditor(QWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        number_layout = QHBoxLayout(self)
+        self.number_spin_box = QSpinBox(self)
+        self.number_spin_box.setRange(0, 127)
+        number_layout.addWidget(self.number_spin_box)
+        self.setLayout(number_layout)
+
+    def set_value(self, value):
+        self.number_spin_box.setValue(value)
+
+    def value(self):
+        return self.number_spin_box.value()
