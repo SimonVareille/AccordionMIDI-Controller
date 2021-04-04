@@ -1,7 +1,7 @@
 """Holds graphical representation of keyboards."""
-from copy import deepcopy
 import sip
 
+# pylint: disable=E0611
 from PyQt5.QtCore import Qt, qFuzzyCompare, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsItem,\
     QGraphicsObject, QGraphicsSimpleTextItem, QDialog, QFormLayout,\
@@ -12,7 +12,7 @@ from PyQt5.QtSvg import QGraphicsSvgItem
 
 from core.keyboard import NoteData, ProgramData, ControlData
 
-import gui.resources
+import gui.resources  # pylint: disable=W0611
 
 
 class KeyboardGraphicalView(QGraphicsView):
@@ -40,6 +40,7 @@ class KeyboardGraphicalView(QGraphicsView):
         tile_painter.end()
         # Apply background check-board pattern
         self.setBackgroundBrush(QBrush(tile_pixmap))
+        self.svg_background = None
 
     def load_background_svg(self, filename):
         """
@@ -124,9 +125,9 @@ class KeyboardGraphicalView(QGraphicsView):
         None.
 
         """
-        currentZoom = self.zoom_factor()
-        if((factor < 1 and currentZoom < 0.1)
-           or (factor > 1 and currentZoom > 10)):
+        current_zoom = self.zoom_factor()
+        if((factor < 1 and current_zoom < 0.1)
+           or (factor > 1 and current_zoom > 10)):
             return
         self.scale(factor, factor)
         self.zoom_changed.emit()
@@ -163,6 +164,7 @@ class KeyboardGraphicalView(QGraphicsView):
         None.
 
         """
+        del rect
         painter.save()
         painter.resetTransform()
         painter.drawTiledPixmap(self.viewport().rect(),
@@ -170,14 +172,55 @@ class KeyboardGraphicalView(QGraphicsView):
         painter.restore()
 
     def mm_to_px(self, x, y):
-        return(x*0.03937008*self.logicalDpiX(),
-               y*0.03937008*self.logicalDpiY())
+        """
+        Convert mm to screen pixels.
+
+        Parameters
+        ----------
+        x : int
+            x coordinate in mm.
+        y : int
+            y coordinate in mm.
+
+        Returns
+        -------
+        int
+            x coordinate in px.
+        int
+            y coordinate in px.
+
+        """
+        return (x*0.03937008*self.logicalDpiX(),
+                y*0.03937008*self.logicalDpiY())
 
     def px_to_mm(self, x, y):
-        return(x/self.logicalDpiX()/25.4,
-               y/self.logicalDpiY()/25.4)
+        """
+        Convert screen pixel to mm.
+
+        Parameters
+        ----------
+        x : int
+            x coordinate in px.
+        y : TYPE
+            y coordinate in px.
+
+        Returns
+        -------
+        int
+            x coordinate in mm.
+        int
+            y coordinate in mm.
+
+        """
+        return (x/self.logicalDpiX()/25.4,
+                y/self.logicalDpiY()/25.4)
 
     def mouseDoubleClickEvent(self, event):
+        """
+        Triggered when mouse is double clicked.
+
+        Detect click on a SVG button.
+        """
         # items = self.items(self.mapToScene(event.pos()).toPoint())
         items = self.items(event.pos())
         for item in items:
@@ -248,12 +291,14 @@ class Right81ButtonKeyboardGraphicalView(KeyboardGraphicalView):
                 75 + button_gap * i, 20, i+66))
 
     def update(self):
+        """Update buttons."""
         for i in range(81):
             self.buttons_svg[i].set_midi_data(
                 self.keyboard_state.keyboard.get_data(i+1))
             self.buttons_svg[i].update()
 
     def button_changed(self, index, midi_data):
+        """Triggered when a button data changes."""
         self.keyboard_state.set_keyboard_data(index, midi_data)
 
 
@@ -281,6 +326,7 @@ class SvgButton(QGraphicsObject):
         self.center_text()
 
     def open_popup(self):
+        """Open edit dialog."""
         dlg = ButtonDialog(self.parent)
         dlg.set_midi_data(self.midi_data)
         if dlg.exec_():
@@ -289,15 +335,21 @@ class SvgButton(QGraphicsObject):
         self.update()
 
     def set_midi_data(self, midi_data):
+        """Set the midi data of the button."""
         self.midi_data = midi_data
         self.setToolTip(str(self.midi_data))
 
     def center_text(self):
+        """Center the text of the button."""
         text_center = self.button_text.boundingRect().center()
         button_center = self.button_svg.boundingRect().center()
         self.button_text.setPos(button_center-text_center)
 
-    def update(self, *args):
+    def update(self):
+        """Update the button.
+
+        Update text and tooltip.
+        """
         if self.show_midi_pitch:
             if isinstance(self.midi_data, NoteData):
                 self.button_text.setText(str(self.midi_data.pitch))
@@ -314,9 +366,10 @@ class SvgButton(QGraphicsObject):
                 self.setToolTip(str(self.midi_data))
 
     def boundingRect(self):
+        """Return the bounding rect of the button."""
         return self.button_svg.boundingRect()
 
-    def paint(self, painter, option, widget):
+    def paint(self, *args, **kwargs):
         pass
 
 
@@ -352,6 +405,7 @@ class ButtonDialog(QDialog):
         self.setLayout(self.main_layout)
 
     def button_type_changed(self, index):
+        """Triggered when the button type change."""
         if index == 0:
             # Note
             center = NoteDataEditor(self)
@@ -435,11 +489,13 @@ class NoteDataEditor(QWidget):
         self.setLayout(self.form_layout)
 
     def set_data(self, note_data):
+        # pylint: disable=C0116
         self.pitch_widget.set_value(note_data.pitch)
         self.velocity_widget.set_value(note_data.velocity)
         self.channel_widget.set_value(note_data.channel)
 
     def get_data(self):
+        # pylint: disable=C0116
         return NoteData(self.channel_widget.value(),
                         self.pitch_widget.value(),
                         self.velocity_widget.value())
@@ -460,10 +516,12 @@ class ProgramDataEditor(QWidget):
         self.setLayout(self.form_layout)
 
     def set_data(self, note_data):
+        # pylint: disable=C0116
         self.number_widget.set_value(note_data.number)
         self.channel_widget.set_value(note_data.channel)
 
     def get_data(self):
+        # pylint: disable=C0116
         return ProgramData(self.channel_widget.value(),
                            self.number_widget.value())
 
@@ -486,11 +544,13 @@ class ControlDataEditor(QWidget):
         self.setLayout(self.form_layout)
 
     def set_data(self, note_data):
+        # pylint: disable=C0116
         self.number_widget.set_value(note_data.number)
         self.value_widget.set_value(note_data.value)
         self.channel_widget.set_value(note_data.channel)
 
     def get_data(self):
+        # pylint: disable=C0116
         return ControlData(self.channel_widget.value(),
                            self.number_widget.value(),
                            self.value_widget.value())
@@ -510,9 +570,11 @@ class PitchEditor(QWidget):
         self.setLayout(pitch_layout)
 
     def set_value(self, value):
+        # pylint: disable=C0116
         self.pitch_spin_box.setValue(value)
 
     def value(self):
+        # pylint: disable=C0116
         return self.pitch_spin_box.value()
 
 
@@ -532,9 +594,11 @@ class VelocityEditor(QWidget):
         self.setLayout(velocity_layout)
 
     def set_value(self, value):
+        # pylint: disable=C0116
         self.velocity_spin_box.setValue(value)
 
     def value(self):
+        # pylint: disable=C0116
         return self.velocity_spin_box.value()
 
 
@@ -548,9 +612,11 @@ class ChannelEditor(QWidget):
         self.setLayout(channel_layout)
 
     def set_value(self, value):
+        # pylint: disable=C0116
         self.channel_spin_box.setValue(value)
 
     def value(self):
+        # pylint: disable=C0116
         return self.channel_spin_box.value()
 
 
@@ -564,7 +630,9 @@ class NumberEditor(QWidget):
         self.setLayout(number_layout)
 
     def set_value(self, value):
+        # pylint: disable=C0116
         self.number_spin_box.setValue(value)
 
     def value(self):
+        # pylint: disable=C0116
         return self.number_spin_box.value()
