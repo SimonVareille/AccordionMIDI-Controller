@@ -11,6 +11,7 @@
     <file>icons/save-button.svg</file>
     <file>icons/upload-button.svg</file>
     <file>icons/undo-button.svg</file>
+    <file>icons/redo-button.svg</file>
     <file>icons/help.svg</file>
 </qresource>
 <qresource prefix="/right-81-buttons-svg">

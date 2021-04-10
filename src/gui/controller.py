@@ -6,8 +6,9 @@ title="Flaticon"> www.flaticon.com</a>
 """
 import os
 
+# pylint: disable=E0611
 from PyQt5.QtCore import QSize, Qt, QObject, QCoreApplication
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QDialog
 from PyQt5.QtGui import QIcon
 
 from core import ControllerCore
@@ -15,7 +16,7 @@ from core import ControllerCore
 from .toolbar import ToolBar
 from .keyboardselection import KeyboardFileSelection
 from .keyboardview import CurrentKeyboardsWidget
-import gui.resources
+import gui.resources  # pylint: disable=W0611
 
 
 class ControllerGUI(QMainWindow):
@@ -45,16 +46,20 @@ class ControllerGUI(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(self.actions.exit)
 
+        edit_menu = menubar.addMenu(self.tr('&Edit'))
+        edit_menu.addAction(self.actions.undo)
+        edit_menu.addAction(self.actions.redo)
+
         # Tool bar
 
         self.toolbar = ToolBar(self, self.actions)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
 
-        # Keyboard selection dock
-        self.keyboard_selection = KeyboardFileSelection(self)
-        self.keyboard_selection.setAllowedAreas(
-            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.keyboard_selection)
+        # File selection dock
+        # self.keyboard_selection = KeyboardFileSelection(self)
+        # self.keyboard_selection.setAllowedAreas(
+        #     Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        # self.addDockWidget(Qt.LeftDockWidgetArea, self.keyboard_selection)
 
         # self.populate_keyboard_selection_model()
 
@@ -78,6 +83,7 @@ class ControllerGUI(QMainWindow):
         self.actions.open.triggered.connect(self.open_file_dialog)
         self.actions.save.triggered.connect(self.current_keyboards.save)
         self.actions.save_as.triggered.connect(self.current_keyboards.save_as)
+        self.actions.new.triggered.connect(self.create_keyboard_dialog)
         # self.actions.pull.triggered.connect(
         #     self.pull_layouts)
         # self.actions.create_keyboard.triggered.connect(
@@ -125,6 +131,9 @@ class ControllerGUI(QMainWindow):
         if filename:
             keyboard_state = self.controller.open(filename)
             self.current_keyboards.display_keyboard(keyboard_state)
+
+    def create_keyboard_dialog(self):
+        pass
 
     def populate_keyboard_selection_model(self):
         """
@@ -184,6 +193,20 @@ class Actions(QObject):
             owner)
         self.new.setShortcut('Ctrl+N')
         self.new.setStatusTip(self.tr('Create a new keyboard'))
+        # Undo
+        self.undo = QAction(
+            QIcon(':/icons/undo-button.svg'),
+            self.tr('Undo'),
+            owner)
+        self.undo.setShortcut('Ctrl+Z')
+        self.undo.setStatusTip(self.tr('Undo last action'))
+        # Redo
+        self.redo = QAction(
+            QIcon(':/icons/redo-button.svg'),
+            self.tr('Redo'),
+            owner)
+        self.redo.setShortcut('Ctrl+Shift+Z')
+        self.redo.setStatusTip(self.tr('Redo last undoed action'))
         # Pull from Arduino
         self.pull = QAction(
             QIcon(':/icons/download-button.svg'),
