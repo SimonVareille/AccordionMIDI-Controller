@@ -36,7 +36,7 @@ class ControllerCore:
         Returns
         -------
         KeyboardState
-            The openend keyboard.
+            The opened keyboard.
 
         """
         for kbd in self.keyboards:
@@ -96,6 +96,26 @@ class ControllerCore:
 
         """
         self.keyboards.remove(kbd_state)
+
+    def create(self, kbd_type: type) -> 'KeyboardState':
+        """
+        Create a new empty keyboard.
+
+        Parameters
+        ----------
+        kbd_type : type
+            The type of the keyboard to create.
+
+        Returns
+        -------
+        KeyboardState
+            The created keyboard.
+
+        """
+        kbd_state = KeyboardState(kbd_type())
+
+        self.keyboards.append(kbd_state)
+        return kbd_state
 
     def get_known_keyboards(self, origin: List[Origin] = None
                             ) -> Dict[Origin, List[Keyboard]]:
