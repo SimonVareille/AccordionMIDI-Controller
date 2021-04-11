@@ -362,6 +362,8 @@ class SvgButton(QGraphicsObject):
             elif isinstance(self.midi_data, ControlData):
                 self.button_text.setText(str(self.midi_data.number))
                 self.button_text.setBrush(Qt.green)
+            else:
+                self.button_text.setText('')
 
             if self.midi_data:
                 self.center_text()
