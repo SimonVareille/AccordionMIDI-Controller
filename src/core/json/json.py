@@ -158,7 +158,9 @@ def mididata_from_dict(d: Dict) -> MidiData:
         The generated MidiData.
 
     """
-    if d['__type__'] == 'NoteData':
+    if not d:
+        data = None
+    elif d['__type__'] == 'NoteData':
         data = NoteData(d['channel'], d['pitch'], d['velocity'])
     elif d['__type__'] == 'ProgramData':
         data = ProgramData(d['channel'], d['number'])
