@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,\
 
 from core.keyboard import Left96ButtonKeyboard, Right81ButtonKeyboard
 from .keyboardgraphicalview import Right81ButtonKeyboardGraphicalView
+from core import NothingToUndoError, NothingToRedoError
 
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
@@ -111,6 +112,20 @@ class CurrentKeyboardsWidget(QWidget):
             tab = self.tab_widget.currentWidget()
         tab.save_as()
 
+    def undo(self, index = None):
+        if index:
+            tab = self.tab_widget.widget(index)
+        else:
+            tab = self.tab_widget.currentWidget()
+        tab.undo()
+
+    def redo(self, index = None):
+        if index:
+            tab = self.tab_widget.widget(index)
+        else:
+            tab = self.tab_widget.currentWidget()
+        tab.redo()
+
     def close_tab(self, index):
         tab = self.tab_widget.widget(index)
         kbd_state = tab.keyboard_state
@@ -203,6 +218,20 @@ class KeyboardView(QWidget):
             self.tr("Keyboard Files (*.json)"))[0]
         if filename:
             self.controller.save_as(self.keyboard_state, filename)
+
+    def undo(self):
+        try:
+            self.keyboard_state.undo()
+            self.update()
+        except NothingToUndoError:
+            pass
+
+    def redo(self):
+        try:
+            self.keyboard_state.redo()
+            self.update()
+        except NothingToRedoError:
+            pass
 
 
 class UnknownKeyboardTypeError(Exception):

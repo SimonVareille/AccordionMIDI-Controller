@@ -246,6 +246,30 @@ class KeyboardState:
             self.is_saved = False
             self.keyboard_changed()
 
+    def undo(self):
+        """
+        Undo previous action.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.history.undo()
+        self.keyboard_changed()
+
+    def redo(self):
+        """
+        Redo previous undoed action.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.history.redo()
+        self.keyboard_changed()
+
 
 class History:
     """Class to keep an history of every action performed."""
@@ -281,9 +305,12 @@ class History:
         None.
 
         """
-        command = self._commands.pop()
-        self._redo.append(command)
-        command.undo()
+        try:
+            command = self._commands.pop()
+            self._redo.append(command)
+            command.undo()
+        except IndexError as err:
+            raise NothingToUndoError("There is nothing to undo") from err
 
     def redo(self):
         """
@@ -294,9 +321,12 @@ class History:
         None.
 
         """
-        command = self._redo.pop()
-        self._commands.append(command)
-        command.execute()
+        try:
+            command = self._redo.pop()
+            self._commands.append(command)
+            command.execute()
+        except IndexError as err:
+            raise NothingToRedoError("There is nothing to redo") from err
 
 
 class RenameKeyboard():
@@ -327,4 +357,11 @@ class SetKeyboardData():
 
 
 class UnknownFileTypeError(Exception):
+    pass
+
+
+class NothingToUndoError(Exception):
+    pass
+
+class NothingToRedoError(Exception):
     pass

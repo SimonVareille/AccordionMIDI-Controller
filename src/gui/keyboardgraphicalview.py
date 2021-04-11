@@ -235,6 +235,8 @@ class Right81ButtonKeyboardGraphicalView(KeyboardGraphicalView):
     def __init__(self, parent, kbd_state):
         super().__init__(parent, kbd_state)
 
+        kbd_state.keyboard_changed.connect(self.update)
+
         self.load_background_svg(":/right-81-buttons-svg/background.svg")
         self.load_buttons_svg(":/right-81-buttons-svg/button.svg")
         self.update()
