@@ -440,6 +440,7 @@ class ButtonDialog(QDialog):
 
         """
         self.midi_data = midi_data
+
         if isinstance(midi_data, NoteData):
             center = NoteDataEditor(self)
             self.button_type.setCurrentIndex(0)
@@ -449,10 +450,14 @@ class ButtonDialog(QDialog):
         elif isinstance(midi_data, ControlData):
             center = ControlDataEditor(self)
             self.button_type.setCurrentIndex(2)
+        else:
+            center = NoteDataEditor(self)
+            self.button_type.setCurrentIndex(0)
         self.main_layout.replaceWidget(self.center, center)
         sip.delete(self.center)
         self.center = center
-        self.center.set_data(midi_data)
+        if midi_data:
+            self.center.set_data(midi_data)
 
     def accept(self):
         """

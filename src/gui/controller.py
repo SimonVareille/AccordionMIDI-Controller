@@ -8,10 +8,12 @@ import os
 
 # pylint: disable=E0611
 from PyQt5.QtCore import QSize, Qt, QObject, QCoreApplication
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QDialog
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QDialog,\
+    QDialogButtonBox, QVBoxLayout, QFormLayout, QComboBox, QLabel
 from PyQt5.QtGui import QIcon
 
 from core import ControllerCore
+from core.keyboard import Right81ButtonKeyboard
 
 from .toolbar import ToolBar
 from .keyboardselection import KeyboardFileSelection
@@ -133,7 +135,19 @@ class ControllerGUI(QMainWindow):
             self.current_keyboards.display_keyboard(keyboard_state)
 
     def create_keyboard_dialog(self):
-        pass
+        """
+        Open the keyboard creation dialog.
+
+        Returns
+        -------
+        None.
+
+        """
+        dlg = CreateKeyboardDialog()
+        if dlg.exec_() and dlg.selected_type:
+            keyboard_state = self.controller.create(dlg.selected_type)
+            self.current_keyboards.display_keyboard(keyboard_state)
+        
 
     def populate_keyboard_selection_model(self):
         """
@@ -247,3 +261,63 @@ class Actions(QObject):
             QIcon(':/icons/help.svg'),
             self.tr('About'),
             owner)
+
+
+class CreateKeyboardDialog(QDialog):
+    """Dialog to create a new keyboard."""
+
+    keyboard_types = [{'name': QCoreApplication.translate(
+        'CreateKeyboardDialog',
+        'Right 81 Buttons Keyboard'),
+                       'type': Right81ButtonKeyboard,
+                       'desc': QCoreApplication.translate(
+                           'CreateKeyboardDialog', """
+<p>A right button keyboard of 81 button, as 4 rows of 16 buttons
+and 1 row of 17 buttons.</p>
+<br/>
+<img src=':/right-81-buttons-svg/full.svg'>
+""")}]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.selected_type = None
+
+        self.setWindowTitle(self.tr("Create a new keyboard"))
+        self.setWindowModality(Qt.WindowModal)
+
+        main_layout = QVBoxLayout(self)
+
+        self.keyboard_type = QComboBox(self)
+        for kbd in self.keyboard_types:
+            self.keyboard_type.addItem(kbd['name'])
+        self.keyboard_type.currentIndexChanged.connect(self.set_description)
+
+        self.description_label = QLabel(self)
+        self.description_label.setTextFormat(Qt.RichText)
+        self.set_description()
+
+        form = QFormLayout(self)
+        form.addRow(self.tr("Keyboard type:"), self.keyboard_type)
+        form.addRow(self.tr("Description:"), self.description_label)
+
+        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+
+        self.button_box = QDialogButtonBox(QBtn, self)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+        main_layout.addLayout(form)
+        main_layout.addWidget(self.button_box)
+
+        self.setLayout(main_layout)
+
+    def set_description(self, index=None):
+        if not index:
+            index = self.keyboard_type.currentIndex()
+        kbd = self.keyboard_types[index]
+        self.description_label.setText(kbd['desc'])
+
+    def accept(self):
+        index = self.keyboard_type.currentIndex()
+        self.selected_type = self.keyboard_types[index]['type']
+        super().accept()

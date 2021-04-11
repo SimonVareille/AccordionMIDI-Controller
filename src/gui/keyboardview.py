@@ -43,10 +43,14 @@ class CurrentKeyboardsWidget(QWidget):
 
         """
         new_tab = KeyboardView(kbd_state, self.controller)
-
-        self.tab_widget.addTab(new_tab,
-                               os.path.basename(kbd_state.storage.filename)
-                               + ('*' if not kbd_state.is_saved else ''))
+        
+        if kbd_state.storage:
+            self.tab_widget.addTab(new_tab,
+                                   os.path.basename(kbd_state.storage.filename)
+                                   + ('*' if not kbd_state.is_saved else ''))
+        else:
+            self.tab_widget.addTab(new_tab,
+                                   "Untitled*")
         new_tab.changes_made.connect(self.keyboard_changed)
         self.tab_widget.setCurrentWidget(new_tab)
 
@@ -84,9 +88,14 @@ class CurrentKeyboardsWidget(QWidget):
         """
         index = self.tab_widget.indexOf(self.sender())
         kbd_state = self.sender().keyboard_state
-        self.tab_widget.setTabText(index,
-                                   os.path.basename(kbd_state.storage.filename)
-                                   + ('*' if not kbd_state.is_saved else ''))
+        if kbd_state.storage:
+            self.tab_widget.setTabText(index,
+                                       os.path.basename(
+                                           kbd_state.storage.filename)
+                                       + ('*' if not kbd_state.is_saved
+                                          else ''))
+        else:
+            self.tab_widget.setTabText(index, "Untitled*")
 
     def save(self, index = None):
         if index:
@@ -107,6 +116,8 @@ class CurrentKeyboardsWidget(QWidget):
         kbd_state = tab.keyboard_state
         if kbd_state.storage and kbd_state.storage.filename:
             current_name = os.path.basename(kbd_state.storage.filename)
+        else:
+            current_name = "Untitled"
         if not kbd_state.is_saved:
             result = QMessageBox.question(
                 self,
@@ -190,7 +201,8 @@ class KeyboardView(QWidget):
             self.tr("Save Keyboard as"),
             current_name,
             self.tr("Keyboard Files (*.json)"))[0]
-        self.controller.save_as(self.keyboard_state, filename)
+        if filename:
+            self.controller.save_as(self.keyboard_state, filename)
 
 
 class UnknownKeyboardTypeError(Exception):
