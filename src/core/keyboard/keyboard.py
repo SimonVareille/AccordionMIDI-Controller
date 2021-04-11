@@ -97,7 +97,7 @@ class Left96ButtonKeyboard(Keyboard):
         None.
 
         """
-        if not isinstance(data, MidiData):
+        if data is not None and not isinstance(data, MidiData):
             raise TypeError(
                 "data must be of type MidiData (or subclasses), not {}"
                 .format(type(data)))
@@ -168,7 +168,7 @@ class Right81ButtonKeyboard(Keyboard):
         None.
 
         """
-        if not isinstance(data, MidiData):
+        if data is not None and not isinstance(data, MidiData):
             raise TypeError(
                 "data must be of type MidiData (or subclasses), not {}"
                 .format(type(data)))
