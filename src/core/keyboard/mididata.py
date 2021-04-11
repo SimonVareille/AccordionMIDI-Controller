@@ -70,9 +70,12 @@ class NoteData(MidiData):
             self._velocity = velocity
 
     def __eq__(self, o):
-        return self._channel == o._channel and\
-            self._pitch == o._pitch and\
-            self._velocity == o._velocity
+        if isinstance(o, NoteData):
+            return self._channel == o._channel and\
+                self._pitch == o._pitch and\
+                self._velocity == o._velocity
+        else:
+            return NotImplemented
 
     @property
     def channel(self) -> int:
@@ -131,8 +134,11 @@ class ProgramData(MidiData):
             self._number = number
 
     def __eq__(self, o):
-        return self._channel == o._channel and\
-            self._number == o._number
+        if isinstance(o, ProgramData):
+            return self._channel == o._channel and\
+                self._number == o._number
+        else:
+            return NotImplemented
 
     @property
     def channel(self) -> int:
@@ -190,9 +196,12 @@ class ControlData(MidiData):
             self._value = value
 
     def __eq__(self, o):
-        return self._channel == o._channel and\
-            self._number == o._number and\
-            self._value == o._value
+        if isinstance(o, ControlData):
+            return self._channel == o._channel\
+                and self._number == o._number\
+                and self._value == o._value
+        else:
+            return NotImplemented
 
     @property
     def channel(self) -> int:
