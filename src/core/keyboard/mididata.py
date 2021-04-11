@@ -57,15 +57,15 @@ class NoteData(MidiData):
         self._pitch = None
         self._velocity = None
 
-        if channel:
+        if channel is not None:
             _verify_channel(channel)
             self._channel = channel
 
-        if pitch:
+        if pitch is not None:
             _verify_pitch(pitch)
             self._pitch = pitch
 
-        if velocity:
+        if velocity is not None:
             _verify_velocity(velocity)
             self._velocity = velocity
 
@@ -125,11 +125,11 @@ class ProgramData(MidiData):
         self._channel = None
         self._number = None
 
-        if channel:
+        if channel is not None:
             _verify_channel(channel)
             self._channel = channel
 
-        if number:
+        if number is not None:
             _verify_number(number)
             self._number = number
 
@@ -183,15 +183,15 @@ class ControlData(MidiData):
         self._number = None
         self._value = None
 
-        if channel:
+        if channel is not None:
             _verify_channel(channel)
             self._channel = channel
 
-        if number:
+        if number is not None:
             _verify_number(number)
             self._number = number
 
-        if value:
+        if value is not None:
             _verify_value(value)
             self._value = value
 
