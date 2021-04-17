@@ -13,6 +13,8 @@
     <file>icons/undo-button.svg</file>
     <file>icons/redo-button.svg</file>
     <file>icons/help.svg</file>
+    <file>icons/settings.svg</file>
+    <file>icons/input-output.svg</file>
 </qresource>
 <qresource prefix="/right-81-buttons-svg">
     <file alias="background.svg">svg/right-81-buttons-background.svg</file>

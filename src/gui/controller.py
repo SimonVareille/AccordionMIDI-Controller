@@ -18,6 +18,7 @@ from core.keyboard import Right81ButtonKeyboard
 from .toolbar import ToolBar
 from .keyboardselection import KeyboardFileSelection
 from .keyboardview import CurrentKeyboardsWidget
+from .settings import SettingsDialog
 import gui.resources  # pylint: disable=W0611
 
 
@@ -51,6 +52,8 @@ class ControllerGUI(QMainWindow):
         edit_menu = menubar.addMenu(self.tr('&Edit'))
         edit_menu.addAction(self.actions.undo)
         edit_menu.addAction(self.actions.redo)
+        edit_menu.addSeparator()
+        edit_menu.addAction(self.actions.settings)
 
         # Tool bar
 
@@ -88,6 +91,8 @@ class ControllerGUI(QMainWindow):
         self.actions.new.triggered.connect(self.create_keyboard_dialog)
         self.actions.undo.triggered.connect(self.current_keyboards.undo)
         self.actions.redo.triggered.connect(self.current_keyboards.redo)
+        self.actions.settings.triggered.connect(self.settings_dialog)
+        self.actions.send.triggered.connect(self.current_keyboards.send)
         # self.actions.pull.triggered.connect(
         #     self.pull_layouts)
         # self.actions.create_keyboard.triggered.connect(
@@ -149,7 +154,10 @@ class ControllerGUI(QMainWindow):
         if dlg.exec_() and dlg.selected_type:
             keyboard_state = self.controller.create(dlg.selected_type)
             self.current_keyboards.display_keyboard(keyboard_state)
-        
+
+    def settings_dialog(self):
+        dlg = SettingsDialog(self.controller, self)
+        dlg.exec_()
 
     def populate_keyboard_selection_model(self):
         """
@@ -223,6 +231,13 @@ class Actions(QObject):
             owner)
         self.redo.setShortcut('Ctrl+Shift+Z')
         self.redo.setStatusTip(self.tr('Redo last undoed action'))
+        # Settings
+        self.settings = QAction(
+            QIcon(':/icons/settings.svg'),
+            self.tr('Settings'),
+            owner)
+        self.settings.setShortcut('Ctrl+P')
+        self.settings.setStatusTip(self.tr('Redo last undoed action'))
         # Pull from Arduino
         self.pull = QAction(
             QIcon(':/icons/download-button.svg'),
@@ -238,20 +253,15 @@ class Actions(QObject):
             QIcon(':/icons/round-delete-button.svg'),
             self.tr('Delete current keyboard'),
             owner)
-        # Apply on Arduino
-        self.apply_keyboard = QAction(
+        # Send to Arduino
+        self.send = QAction(
             QIcon(':/icons/send-button.svg'),
-            self.tr('Apply current keyboard on accordion'),
+            self.tr('Send current keyboard to the accordion'),
             owner)
         # Store on Arduino
         self.store_keyboard = QAction(
-            QIcon(':/icons/save-button.svg'),
-            self.tr('Store current keyboard on accordion'),
-            owner)
-        # Apply and store on Arduino
-        self.apply_and_store_keyboard = QAction(
             QIcon(':/icons/upload-button.svg'),
-            self.tr('Apply and store current keyboard on accordion'),
+            self.tr('Store current keyboard on accordion'),
             owner)
         # Reset
         self.reset_keyboard = QAction(

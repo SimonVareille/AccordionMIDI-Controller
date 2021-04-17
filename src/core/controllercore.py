@@ -149,6 +149,50 @@ class ControllerCore:
                     self.arduino.get_current_right_keyboard())
         return result
 
+    def connect_midi(self, inport=None, outport=None):
+        """
+        Connect the MIDI ports.
+
+        Parameters
+        ----------
+        inport : str, optional
+            The input port to connect to. The default is None.
+        outport : str, optional
+            The output port to connect to. The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+        if inport:
+            midiio.connect_input(inport)
+        if outport:
+            midiio.connect_output(outport)
+
+    def is_midi_input_ready(self):
+        """Return True if the MIDI input port is ready, False otherwise."""
+        return midiio.input_ready()
+
+    def is_midi_output_ready(self):
+        """Return True if the MIDI output port is ready, False otherwise."""
+        return midiio.input_ready()
+
+    def list_midi_ports(self):
+        """
+        List all MIDI ports.
+
+        Returns
+        -------
+        List of str
+            The names of the available input ports.
+        List of str
+            The names of the available output ports.
+
+        """
+        return midiio.list_input_ports(), midiio.list_output_ports()
+   
+
 
 class KeyboardState:
     """Keep every infos about a keyboard."""
