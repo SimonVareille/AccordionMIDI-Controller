@@ -7,7 +7,7 @@ title="Flaticon"> www.flaticon.com</a>
 import os
 
 # pylint: disable=E0611
-from PyQt5.QtCore import QSize, Qt, QObject, QCoreApplication
+from PyQt5.QtCore import QSize, Qt, QObject, QCoreApplication, QSettings
 from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QDialog,\
     QDialogButtonBox, QVBoxLayout, QFormLayout, QComboBox, QLabel
 from PyQt5.QtGui import QIcon
@@ -73,6 +73,7 @@ class ControllerGUI(QMainWindow):
 
         self.connect_actions()
 
+        self.load_settings()
         self.statusBar().showMessage(self.tr("Initialization done"))
 
     def connect_actions(self):
@@ -112,16 +113,11 @@ class ControllerGUI(QMainWindow):
         # self.actions.about.triggered.connect(
         #     self.about_dialog)
 
-    def close(self):
-        """
-        Close the applicaiton.
-
-        Returns
-        -------
-        None.
-
-        """
-        QCoreApplication.quit()
+    def closeEvent(self, *args, **kwargs):
+        """Clean everything before closing."""
+        print("Closing...")
+        self.controller.close_midi()
+        super().closeEvent(*args, **kwargs)
 
     def open_file_dialog(self):
         """
@@ -156,8 +152,18 @@ class ControllerGUI(QMainWindow):
             self.current_keyboards.display_keyboard(keyboard_state)
 
     def settings_dialog(self):
+        """Open the settings dialog."""
         dlg = SettingsDialog(self.controller, self)
+        dlg.settings_changed.connect(self.load_settings)
         dlg.exec_()
+
+    def load_settings(self):
+        """Update UI and core regarding settings."""
+        settings = QSettings()
+        settings.beginGroup("midi")
+        self.controller.connect_midi(str(settings.value("inport", "")),
+                                     str(settings.value("outport", "")))
+        settings.endGroup()
 
     def populate_keyboard_selection_model(self):
         """

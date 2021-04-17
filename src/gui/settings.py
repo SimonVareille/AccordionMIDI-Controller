@@ -15,6 +15,8 @@ import gui.resources  # pylint: disable=W0611
 class SettingsDialog(QDialog):
     """Display a dialog used to update settings."""
 
+    settings_changed = pyqtSignal()
+
     def __init__(self, controller, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -75,6 +77,7 @@ class SettingsDialog(QDialog):
         for index in range(self.pages.count()):
             self.pages.widget(index).apply()
         self.button_box.button(QDialogButtonBox.Apply).setEnabled(False)
+        self.settings_changed.emit()
 
     def accept(self):
         """Apply (save) changes and quit the settings dialog."""

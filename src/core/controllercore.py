@@ -170,6 +170,10 @@ class ControllerCore:
         if outport:
             midiio.connect_output(outport)
 
+    def close_midi(self):
+        """Close the MIDI ports."""
+        midiio.close()
+
     def is_midi_input_ready(self):
         """Return True if the MIDI input port is ready, False otherwise."""
         return midiio.input_ready()
