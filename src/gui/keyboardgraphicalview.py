@@ -1,12 +1,11 @@
 """Holds graphical representation of keyboards."""
-import sip
 
 # pylint: disable=E0611
 from PyQt5.QtCore import Qt, qFuzzyCompare, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsItem,\
     QGraphicsObject, QGraphicsSimpleTextItem, QDialog, QFormLayout,\
     QVBoxLayout, QHBoxLayout, QSpinBox, QDial, QDialogButtonBox, QComboBox,\
-    QWidget
+    QWidget, QStackedWidget
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QBrush
 from PyQt5.QtSvg import QGraphicsSvgItem
 
@@ -395,7 +394,11 @@ class ButtonDialog(QDialog):
                                    self.tr("Control")])
         self.button_type.currentIndexChanged.connect(self.button_type_changed)
 
-        self.center = QWidget(self)  # NoteDataEditor()
+        # self.center = QWidget(self)  # NoteDataEditor()
+        self.center = QStackedWidget(self)
+        self.center.addWidget(NoteDataEditor(self))
+        self.center.addWidget(ProgramDataEditor(self))
+        self.center.addWidget(ControlDataEditor(self))
 
         QBtn = QDialogButtonBox.Save | QDialogButtonBox.Cancel
 
@@ -410,24 +413,19 @@ class ButtonDialog(QDialog):
 
     def button_type_changed(self, index):
         """Triggered when the button type change."""
+        self.center.setCurrentIndex(index)
         if index == 0:
             # Note
-            center = NoteDataEditor(self)
             if isinstance(self.midi_data, NoteData):
-                center.set_data(self.midi_data)
+                self.center.currentWidget().set_data(self.midi_data)
         elif index == 1:
             # Program
-            center = ProgramDataEditor(self)
             if isinstance(self.midi_data, ProgramData):
-                center.set_data(self.midi_data)
+                self.center.currentWidget().set_data(self.midi_data)
         elif index == 2:
             # Control
-            center = ControlDataEditor(self)
             if isinstance(self.midi_data, ControlData):
-                center.set_data(self.midi_data)
-        self.main_layout.replaceWidget(self.center, center)
-        sip.delete(self.center)
-        self.center = center
+                self.center.currentWidget().set_data(self.midi_data)
 
     def set_midi_data(self, midi_data):
         """
@@ -446,22 +444,17 @@ class ButtonDialog(QDialog):
         self.midi_data = midi_data
 
         if isinstance(midi_data, NoteData):
-            center = NoteDataEditor(self)
             self.button_type.setCurrentIndex(0)
+            self.button_type_changed(0)
         elif isinstance(midi_data, ProgramData):
-            center = ProgramDataEditor(self)
             self.button_type.setCurrentIndex(1)
+            self.button_type_changed(1)
         elif isinstance(midi_data, ControlData):
-            center = ControlDataEditor(self)
             self.button_type.setCurrentIndex(2)
+            self.button_type_changed(2)
         else:
-            center = NoteDataEditor(self)
             self.button_type.setCurrentIndex(0)
-        self.main_layout.replaceWidget(self.center, center)
-        sip.delete(self.center)
-        self.center = center
-        if midi_data:
-            self.center.set_data(midi_data)
+            self.button_type_changed(0)
 
     def accept(self):
         """
@@ -472,7 +465,7 @@ class ButtonDialog(QDialog):
         None.
 
         """
-        self.midi_data = self.center.get_data()
+        self.midi_data = self.center.currentWidget().get_data()
         # if isinstance(self.midi_data, NoteData):
         #     self.midi_data.pitch = self.pitch_spin_box.value()
         #     self.midi_data.velocity = self.velocity_spin_box.value()
