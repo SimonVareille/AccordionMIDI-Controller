@@ -260,8 +260,8 @@ class KeyboardView(QWidget):
                 self.keyboard_state.keyboard)
             self.show_message.emit(
                 self.tr("The keyboard has successfully been sent."))
-        except Exception as err:
-            result = QMessageBox.critical(
+        except Exception:
+            QMessageBox.critical(
                 self,
                 self.tr("Error sending keyboard"),
                 self.tr("The keyboard has not been sent.<br/>\
@@ -272,8 +272,21 @@ class KeyboardView(QWidget):
             raise
 
     def store(self):
-        self.controller.arduino.store_keyboard(
-            self.keyboard_state.keyboard)
+        try:
+            self.controller.arduino.store_keyboard(
+                self.keyboard_state.keyboard)
+            self.show_message.emit(
+                self.tr("The keyboard has successfully been stored."))
+        except Exception:
+            QMessageBox.critical(
+                self,
+                self.tr("Error sending keyboard"),
+                self.tr("The keyboard has not been stored.<br/>\
+                        The following error occured:<br/>\
+                        <code>{!s}</code>").format(traceback.format_exc()),
+                QMessageBox.StandardButtons(QMessageBox.Ok),
+                QMessageBox.Cancel)
+            raise
 
 
 class UnknownKeyboardTypeError(Exception):
