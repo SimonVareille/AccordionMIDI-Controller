@@ -161,6 +161,7 @@ class ControllerGUI(QMainWindow):
         """Update UI and core regarding settings."""
         settings = QSettings()
         settings.beginGroup("midi")
+        self.controller.close_midi()
         self.controller.connect_midi(str(settings.value("inport", "")),
                                      str(settings.value("outport", "")))
         settings.endGroup()
