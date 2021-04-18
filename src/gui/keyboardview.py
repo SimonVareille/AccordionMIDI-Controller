@@ -1,5 +1,6 @@
 """Widgets displaying the keyboards."""
 import os
+import traceback
 # from functools import partial
 
 from PyQt5.QtCore import pyqtSignal
@@ -13,6 +14,8 @@ from core import NothingToUndoError, NothingToRedoError
 
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
+    
+    show_message = pyqtSignal([str], [str, int])
 
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -54,6 +57,7 @@ class CurrentKeyboardsWidget(QWidget):
             self.tab_widget.addTab(new_tab,
                                    "Untitled*")
         new_tab.changes_made.connect(self.keyboard_changed)
+        new_tab.show_message.connect(self.show_message)
         self.tab_widget.setCurrentWidget(new_tab)
 
     def display_keyboard(self, kbd_state):
@@ -154,21 +158,23 @@ class CurrentKeyboardsWidget(QWidget):
                 self.tr("Unsaved changes"),
                 self.tr(f"<b>{current_name}</b> has been modified.<br/>\
                         Would you like to save the changes?"),
-                QMessageBox.StandardButtons(QMessageBox.Yes
-                                            | QMessageBox.No
+                QMessageBox.StandardButtons(QMessageBox.Save
+                                            | QMessageBox.Discard
                                             | QMessageBox.Cancel),
                 QMessageBox.Cancel)
             if result == QMessageBox.Cancel:
                 return
-            elif result == QMessageBox.Yes:
+            elif result == QMessageBox.Save:
                 self.save(index)
         self.controller.close(kbd_state)
         self.tab_widget.removeTab(index)
+
 
 class KeyboardView(QWidget):
     """Widget containing everything a keyboard need."""
 
     changes_made = pyqtSignal()
+    show_message = pyqtSignal([str], [str, int])
 
     def __init__(self, kbd_state, controller):
         super().__init__()
@@ -249,8 +255,21 @@ class KeyboardView(QWidget):
             pass
 
     def send(self):
-        self.controller.arduino.set_current_keyboard(
-            self.keyboard_state.keyboard)
+        try:
+            self.controller.arduino.set_current_keyboard(
+                self.keyboard_state.keyboard)
+            self.show_message.emit(
+                self.tr("The keyboard has successfully been sent."))
+        except Exception as err:
+            result = QMessageBox.critical(
+                self,
+                self.tr("Error sending keyboard"),
+                self.tr("The keyboard has not been sent.<br/>\
+                        The following error occured:<br/>\
+                        <code>{!s}</code>").format(traceback.format_exc()),
+                QMessageBox.StandardButtons(QMessageBox.Ok),
+                QMessageBox.Cancel)
+            raise
 
     def store(self):
         self.controller.arduino.store_keyboard(

@@ -70,11 +70,12 @@ class ControllerGUI(QMainWindow):
 
         self.current_keyboards = CurrentKeyboardsWidget(self, self.controller)
         self.setCentralWidget(self.current_keyboards)
+        self.current_keyboards.show_message.connect(self.show_status_message)
 
         self.connect_actions()
 
         self.load_settings()
-        self.statusBar().showMessage(self.tr("Initialization done"))
+        self.show_status_message(self.tr("Initialization done"))
 
     def connect_actions(self):
         """
@@ -187,6 +188,26 @@ class ControllerGUI(QMainWindow):
             for kbd in lst_kbds:
                 self.keyboard_selection.selection_model.add_keyboard(
                     origin, kbd)
+
+    def show_status_message(self, message, timeout=5000):
+        """
+        Show the given message in the status bar for `time` milliseconds.
+
+        Parameters
+        ----------
+        message : str
+            The message to show.
+        timeout : int, optional
+            The time in milliseconds for wich to show the message.
+            If 0, the message is displayed until another message comes.
+            The default is 5000.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.statusBar().showMessage(message, timeout)
 
 
 class Actions(QObject):
