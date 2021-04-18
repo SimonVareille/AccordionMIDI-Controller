@@ -163,8 +163,13 @@ class ControllerGUI(QMainWindow):
         settings = QSettings()
         settings.beginGroup("midi")
         self.controller.close_midi()
-        self.controller.connect_midi(str(settings.value("inport", "")),
-                                     str(settings.value("outport", "")))
+        inprt = str(settings.value("inport", "-"))
+        if inprt == "-":
+            inprt = None
+        outprt = str(settings.value("outport", "-"))
+        if outprt == "-":
+            outprt = None
+        self.controller.connect_midi(inprt, outprt)
         settings.endGroup()
 
     def populate_keyboard_selection_model(self):
