@@ -9,7 +9,8 @@ The MIDI messages used for controlling the Arduino are SysEx messages.
 
 Theses messages start with byte `11110000` (`0xF0`) and end with byte `11110111`
 
-The first data byte (the manufacturer ID) is `0x7D`, usable for "prototyping, test, private use and experimentation".[1]
+The first data byte (the manufacturer ID) is `0x7D`, usable for
+"prototyping, test, private use and experimentation".[1]
 
 Every data byte in a SysEx message must begin with the bit `0`. Therefore, each
 byte must be between 0 and 127.
@@ -90,7 +91,8 @@ With:
    [Keyboard types](#keyboard-types)
    section.
 - `name` the name of the keyboard. Must end with `0x00`. As original name is a
-UTF-8 string, it must be converted to 7-bit stream. We simply use base-64 encoding to send it.
+UTF-8 string, it must be converted to 7-bit stream. We simply use base-64
+encoding to send it.
 
 ### Rename a keyboard
 
@@ -167,6 +169,12 @@ There are currently 3 types of midi data:
 1. Note data;
 2. Program data;
 3. Control data.
+
+### Null data
+
+If there is no data:
+`type`: `0x00`
+`data`:``
 
 ### Note data
 

@@ -18,6 +18,34 @@ class KeyboardMidiDAO(KeyboardDAO):
         super().__init__()
         self._keyboard_type = None
 
+    @staticmethod
+    def _get_midi_data(data, data_index):
+        data_midi_dao = None
+        if data[data_index] == 0x00:
+            return None, 1
+        elif data[data_index] == 0x01:
+            data_midi_dao = NoteDataMidiDAO
+        elif data[data_index] == 0x02:
+            data_midi_dao = ProgramDataMidiDAO
+        elif data[data_index] == 0x03:
+            data_midi_dao = ControlDataMidiDAO()
+        return data_midi_dao.from_bytes(data[data_index:])
+
+    @staticmethod
+    def _get_midi_data_bytes(midi_data):
+        midi_dao = None
+        if isinstance(midi_data, NoteData):
+            midi_dao = NoteDataMidiDAO
+        elif isinstance(midi_data, ProgramData):
+            midi_dao = ProgramDataMidiDAO
+        elif isinstance(midi_data, ControlData):
+            midi_dao = ControlDataMidiDAO
+
+        if midi_dao:
+            return midi_dao.to_bytes(midi_data)
+        else:
+            return bytes([0x00])
+
     @abstractmethod
     def from_bytes(self, data: bytes) -> Keyboard:
         """
@@ -180,15 +208,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
             # Index of the current key of the Left96ButtonKeyboard
             keyboard_index = -1
             for _ in range(96):
-                data_midi_dao = None
-                if data[data_index] == 0x01:
-                    data_midi_dao = NoteDataMidiDAO
-                elif data[data_index] == 0x02:
-                    data_midi_dao = ProgramDataMidiDAO
-                elif data[data_index] == 0x03:
-                    data_midi_dao = ControlDataMidiDAO
-
-                midi_data, skip = data_midi_dao.from_bytes(data[data_index:])
+                midi_data, skip = self._get_midi_data(data, data_index)
 
                 keyboard.set_data(keyboard_index+2, midi_data)
 
@@ -219,15 +239,7 @@ class Left96ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
         keyboard_index = -1
         for _ in range(96):
-            midi_dao = None
-            if isinstance(kbd.get_data(keyboard_index+2), NoteData):
-                midi_dao = NoteDataMidiDAO
-            elif isinstance(kbd.get_data(keyboard_index+2), ProgramData):
-                midi_dao = ProgramDataMidiDAO
-            elif isinstance(kbd.get_data(keyboard_index+2), ControlData):
-                midi_dao = ControlDataMidiDAO
-            data += midi_dao.to_bytes(
-                    kbd.get_data(keyboard_index+2))
+            data += self._get_midi_data_bytes(kbd.get_data(keyboard_index+2))
             keyboard_index = (keyboard_index + 16) % 95
 
         return data
@@ -239,28 +251,6 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
     def __init__(self):
         super().__init__()
         self._keyboard_type = 0x01
-
-    @staticmethod
-    def _get_midi_data(data, data_index):
-        data_midi_dao = None
-        if data[data_index] == 0x01:
-            data_midi_dao = NoteDataMidiDAO
-        elif data[data_index] == 0x02:
-            data_midi_dao = ProgramDataMidiDAO
-        elif data[data_index] == 0x03:
-            data_midi_dao = ControlDataMidiDAO
-        return data_midi_dao.from_bytes(data[data_index:])
-
-    @staticmethod
-    def _get_midi_data_dao(midi_data):
-        midi_dao = None
-        if isinstance(midi_data, NoteData):
-            midi_dao = NoteDataMidiDAO
-        elif isinstance(midi_data, ProgramData):
-            midi_dao = ProgramDataMidiDAO
-        elif isinstance(midi_data, ControlData):
-            midi_dao = ControlDataMidiDAO
-        return midi_dao
 
     def from_bytes(self, data: bytes) -> Right81ButtonKeyboard:
         """
@@ -327,19 +317,16 @@ class Right81ButtonKeyboardMidiDAO(KeyboardMidiDAO):
 
         for i in range(5):
             midi_data = kbd.get_data((66, 17, 34, 50, 67)[i])
-            midi_dao = self._get_midi_data_dao(midi_data)
-            data += midi_dao.to_bytes(midi_data)
+            data += self._get_midi_data_bytes(midi_data)
 
         for j in range(14):
             for i in range(5):
                 keyboard_index = (1, 18, 35, 51, 68)[i]+j
                 midi_data = kbd.get_data(keyboard_index)
-                midi_dao = self._get_midi_data_dao(midi_data)
-                data += midi_dao.to_bytes(midi_data)
+                data += self._get_midi_data_bytes(midi_data)
 
         for i in range(6):
             midi_data = kbd.get_data((15, 32, 49, 65, 16, 33)[i])
-            midi_dao = self._get_midi_data_dao(midi_data)
-            data += midi_dao.to_bytes(midi_data)
+            data += self._get_midi_data_bytes(midi_data)
 
         return data
