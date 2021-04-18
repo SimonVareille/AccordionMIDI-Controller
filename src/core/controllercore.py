@@ -195,7 +195,6 @@ class ControllerCore:
 
         """
         return midiio.list_input_ports(), midiio.list_output_ports()
-   
 
 
 class KeyboardState:
@@ -233,26 +232,6 @@ class KeyboardState:
         self.storage.save(self.keyboard)
         self.is_saved = True
         self.keyboard_changed()
-
-    def store(self):
-        """
-        Store the keyboard of the Arduino.
-
-        Returns
-        -------
-        None.
-
-        """
-
-    def set_as_current(self):
-        """
-        Set the keyboard as current on the Arduino.
-
-        Returns
-        -------
-        None.
-
-        """
 
     def rename(self, new_name: str):
         """

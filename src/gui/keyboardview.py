@@ -10,6 +10,7 @@ from core.keyboard import Left96ButtonKeyboard, Right81ButtonKeyboard
 from .keyboardgraphicalview import Right81ButtonKeyboardGraphicalView
 from core import NothingToUndoError, NothingToRedoError
 
+
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
 
@@ -98,33 +99,47 @@ class CurrentKeyboardsWidget(QWidget):
         else:
             self.tab_widget.setTabText(index, "Untitled*")
 
-    def save(self, index = None):
+    def save(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
         tab.save()
 
-    def save_as(self, index = None):
+    def save_as(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
         tab.save_as()
 
-    def undo(self, index = None):
+    def undo(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
         tab.undo()
 
-    def redo(self, index = None):
+    def redo(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
         tab.redo()
+
+    def send(self, index=None):
+        if index:
+            tab = self.tab_widget.widget(index)
+        else:
+            tab = self.tab_widget.currentWidget()
+        tab.send()
+
+    def store(self, index=None):
+        if index:
+            tab = self.tab_widget.widget(index)
+        else:
+            tab = self.tab_widget.currentWidget()
+        tab.store()
 
     def close_tab(self, index):
         tab = self.tab_widget.widget(index)
@@ -232,6 +247,14 @@ class KeyboardView(QWidget):
             self.update()
         except NothingToRedoError:
             pass
+
+    def send(self):
+        self.controller.arduino.set_current_keyboard(
+            self.keyboard_state.keyboard)
+
+    def store(self):
+        self.controller.arduino.store_keyboard(
+            self.keyboard_state.keyboard)
 
 
 class UnknownKeyboardTypeError(Exception):

@@ -94,6 +94,7 @@ class ControllerGUI(QMainWindow):
         self.actions.redo.triggered.connect(self.current_keyboards.redo)
         self.actions.settings.triggered.connect(self.settings_dialog)
         self.actions.send.triggered.connect(self.current_keyboards.send)
+        self.actions.store.triggered.connect(self.current_keyboards.store)
         # self.actions.pull.triggered.connect(
         #     self.pull_layouts)
         # self.actions.create_keyboard.triggered.connect(
@@ -266,7 +267,7 @@ class Actions(QObject):
             self.tr('Send current keyboard to the accordion'),
             owner)
         # Store on Arduino
-        self.store_keyboard = QAction(
+        self.store = QAction(
             QIcon(':/icons/upload-button.svg'),
             self.tr('Store current keyboard on accordion'),
             owner)
