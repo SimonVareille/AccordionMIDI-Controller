@@ -357,19 +357,31 @@ class History:
 
 
 class RenameKeyboard():
+    """Action to rename a keyboard.
+
+    Usable with History.
+    """
+
     def __init__(self, kbd, new_name):
         self.last_name = kbd.name
         self.new_name = new_name
         self.kbd = kbd
 
     def execute(self):
+        # pylint: disable=C0116
         self.kbd.name = self.new_name
 
     def undo(self):
+        # pylint: disable=C0116
         self.kbd.name = self.last_name
 
 
 class SetKeyboardData():
+    """Action to set a keyboard's data.
+
+    Usable with History.
+    """
+
     def __init__(self, kbd, index, data):
         self.kbd = kbd
         self.index = index
@@ -377,18 +389,20 @@ class SetKeyboardData():
         self.data = deepcopy(data)
 
     def execute(self):
+        # pylint: disable=C0116
         self.kbd.set_data(self.index, self.data)
 
     def undo(self):
+        # pylint: disable=C0116
         self.kbd.set_data(self.index, self.prev_data)
 
 
 class UnknownFileTypeError(Exception):
-    pass
+    """File type is unknown."""
 
 
 class NothingToUndoError(Exception):
-    pass
+    """Nothing to undo."""
 
 class NothingToRedoError(Exception):
-    pass
+    """Nothing to redo."""

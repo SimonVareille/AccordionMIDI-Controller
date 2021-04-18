@@ -3,18 +3,19 @@ import os
 import traceback
 # from functools import partial
 
+# pylint: disable=E0611
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,\
     QLabel, QLineEdit, QFileDialog, QMessageBox
 
+from core import NothingToUndoError, NothingToRedoError
 from core.keyboard import Left96ButtonKeyboard, Right81ButtonKeyboard
 from .keyboardgraphicalview import Right81ButtonKeyboardGraphicalView
-from core import NothingToUndoError, NothingToRedoError
 
 
 class CurrentKeyboardsWidget(QWidget):
     """Widget containing every keyboards widgets currently opened."""
-    
+
     show_message = pyqtSignal([str], [str, int])
 
     def __init__(self, parent, controller):
@@ -48,7 +49,7 @@ class CurrentKeyboardsWidget(QWidget):
 
         """
         new_tab = KeyboardView(kbd_state, self.controller)
-        
+
         if kbd_state.storage:
             self.tab_widget.addTab(new_tab,
                                    os.path.basename(kbd_state.storage.filename)
@@ -104,6 +105,7 @@ class CurrentKeyboardsWidget(QWidget):
             self.tab_widget.setTabText(index, "Untitled*")
 
     def save(self, index=None):
+        """Save keyboard at given index (or current if index is None)."""
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -112,6 +114,10 @@ class CurrentKeyboardsWidget(QWidget):
             tab.save()
 
     def save_as(self, index=None):
+        """Save keyboard at given index (or current if index is None).
+
+        Prompt for a new name.
+        """
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -120,6 +126,7 @@ class CurrentKeyboardsWidget(QWidget):
             tab.save_as()
 
     def undo(self, index=None):
+        """Undo changes at given index (or current if index is None)."""
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -128,6 +135,7 @@ class CurrentKeyboardsWidget(QWidget):
             tab.undo()
 
     def redo(self, index=None):
+        """Redo changes at given index (or current if index is None)."""
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -136,6 +144,10 @@ class CurrentKeyboardsWidget(QWidget):
             tab.redo()
 
     def send(self, index=None):
+        """Send keyboard at given index to Arduino.
+
+        Send current keyboard if index is None.
+        """
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -144,6 +156,10 @@ class CurrentKeyboardsWidget(QWidget):
             tab.send()
 
     def store(self, index=None):
+        """Store keyboard at given index to Arduino.
+
+        Store current keyboard if index is None.
+        """
         if index:
             tab = self.tab_widget.widget(index)
         else:
@@ -152,6 +168,7 @@ class CurrentKeyboardsWidget(QWidget):
             tab.store()
 
     def close_tab(self, index):
+        """Close tab of given index."""
         tab = self.tab_widget.widget(index)
         kbd_state = tab.keyboard_state
         if kbd_state.storage and kbd_state.storage.filename:
@@ -170,7 +187,7 @@ class CurrentKeyboardsWidget(QWidget):
                 QMessageBox.Cancel)
             if result == QMessageBox.Cancel:
                 return
-            elif result == QMessageBox.Save:
+            if result == QMessageBox.Save:
                 self.save(index)
         self.controller.close(kbd_state)
         self.tab_widget.removeTab(index)
@@ -212,20 +229,24 @@ class KeyboardView(QWidget):
         self.connect_signals()
 
     def connect_signals(self):
+        """Connect signals."""
         self.name_edit.editingFinished.connect(self.name_edited)
         self.keyboard_state.keyboard_changed.connect(self.update)
 
     def name_edited(self):
+        """Emit a signal if name has changed."""
         if self.name_edit.text() != self.keyboard_state.keyboard.name:
             self.keyboard_state.rename(self.name_edit.text())
             self.changes_made.emit()
 
     def update(self):
+        """Emit a signal to notify that keyboard has changed."""
         if self.name_edit.text() != self.keyboard_state.keyboard.name:
             self.name_edit.setText(self.keyboard_state.keyboard.name)
         self.changes_made.emit()
 
     def save(self):
+        """Save keyboard."""
         if(self.keyboard_state.storage and
            self.keyboard_state.storage.filename):
             self.keyboard_state.save()
@@ -233,6 +254,7 @@ class KeyboardView(QWidget):
             self.save_as()
 
     def save_as(self):
+        """Save keyboard under a new name."""
         if(self.keyboard_state.storage and
            self.keyboard_state.storage.filename):
             current_name = self.keyboard_state.storage.filename
@@ -247,6 +269,7 @@ class KeyboardView(QWidget):
             self.controller.save_as(self.keyboard_state, filename)
 
     def undo(self):
+        """Undo previous action."""
         try:
             self.keyboard_state.undo()
             self.update()
@@ -254,6 +277,7 @@ class KeyboardView(QWidget):
             pass
 
     def redo(self):
+        """Redo previous undoed action."""
         try:
             self.keyboard_state.redo()
             self.update()
@@ -261,6 +285,7 @@ class KeyboardView(QWidget):
             pass
 
     def send(self):
+        """Send the keyboard to the Arduino."""
         try:
             self.controller.arduino.set_current_keyboard(
                 self.keyboard_state.keyboard)
@@ -278,6 +303,7 @@ class KeyboardView(QWidget):
             raise
 
     def store(self):
+        """Store the keyboard to the Arduino."""
         try:
             self.controller.arduino.store_keyboard(
                 self.keyboard_state.keyboard)
@@ -296,4 +322,4 @@ class KeyboardView(QWidget):
 
 
 class UnknownKeyboardTypeError(Exception):
-    pass
+    """Keyboard type is unknown."""

@@ -358,12 +358,14 @@ and 1 row of 17 buttons.</p>
         self.setLayout(main_layout)
 
     def set_description(self, index=None):
+        """Display the description of keyboard at given index."""
         if not index:
             index = self.keyboard_type.currentIndex()
         kbd = self.keyboard_types[index]
         self.description_label.setText(kbd['desc'])
 
     def accept(self):
+        """Accept current choice."""
         index = self.keyboard_type.currentIndex()
         self.selected_type = self.keyboard_types[index]['type']
         super().accept()

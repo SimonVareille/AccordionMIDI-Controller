@@ -373,6 +373,7 @@ class SvgButton(QGraphicsObject):
         return self.button_svg.boundingRect()
 
     def paint(self, *args, **kwargs):
+        # pylint: disable=C0116
         pass
 
 
@@ -559,6 +560,8 @@ class ControlDataEditor(QWidget):
 
 
 class PitchEditor(QWidget):
+    """Widget to edit the pitch."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         pitch_layout = QHBoxLayout(self)
@@ -581,6 +584,8 @@ class PitchEditor(QWidget):
 
 
 class VelocityEditor(QWidget):
+    """Widget to edit the velocity."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         velocity_layout = QHBoxLayout(self)
@@ -605,6 +610,8 @@ class VelocityEditor(QWidget):
 
 
 class ChannelEditor(QWidget):
+    """Widget to edit the channel."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         channel_layout = QHBoxLayout(self)
@@ -623,6 +630,8 @@ class ChannelEditor(QWidget):
 
 
 class NumberEditor(QWidget):
+    """Widget to edit a program and control number."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         number_layout = QHBoxLayout(self)
