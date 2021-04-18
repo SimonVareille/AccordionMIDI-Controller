@@ -108,42 +108,48 @@ class CurrentKeyboardsWidget(QWidget):
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.save()
+        if tab:
+            tab.save()
 
     def save_as(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.save_as()
+        if tab:
+            tab.save_as()
 
     def undo(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.undo()
+        if tab:
+            tab.undo()
 
     def redo(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.redo()
+        if tab:
+            tab.redo()
 
     def send(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.send()
+        if tab:
+            tab.send()
 
     def store(self, index=None):
         if index:
             tab = self.tab_widget.widget(index)
         else:
             tab = self.tab_widget.currentWidget()
-        tab.store()
+        if tab:
+            tab.store()
 
     def close_tab(self, index):
         tab = self.tab_widget.widget(index)
