@@ -68,6 +68,12 @@ class ControllerGUI(QMainWindow):
 
         # self.populate_keyboard_selection_model()
 
+        # Arduino's keyboards dock
+        self.arduino_keyboards = ArduinoSelectionDock(self, self.controller)
+        self.arduino_keyboards.setAllowedAreas(
+            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.arduino_keyboards)
+
         self.current_keyboards = CurrentKeyboardsWidget(self, self.controller)
         self.setCentralWidget(self.current_keyboards)
         self.current_keyboards.show_message.connect(self.show_status_message)

@@ -3,6 +3,7 @@ import threading
 from typing import List
 from copy import deepcopy
 from core.keyboard import Keyboard, Left96ButtonKeyboard, Right81ButtonKeyboard
+from core.notifications import Notification
 from .io import midiio
 from .io.dao.daofactory import MidiDAOFactory
 
@@ -20,6 +21,7 @@ class Arduino:
         self.left_lock = threading.Lock()
         self.right_lock = threading.Lock()
         self.dao_factory = MidiDAOFactory()
+        self.keyboards_list_changed = Notification()
         midiio.callback = self._add_keyboard_internal
 
     def _add_keyboard_internal(self, kbd: Keyboard, origin: str):
@@ -51,6 +53,7 @@ class Arduino:
                  self.current_right_keyboard != kbd):
                 with self.right_lock:
                     self.current_right_keyboard = kbd
+        self.keyboards_list_changed()
 
     def get_stored_keyboards(self) -> List[Keyboard]:
         """
@@ -103,6 +106,7 @@ class Arduino:
         with self.stored_lock:
             self.stored_keyboards.clear()
         self.dao_factory.get_generic_keyboard_dao().send_fetch_keyboards()
+        self.keyboards_list_changed()
 
     def set_current_keyboard(self, kbd: Keyboard):
         """
@@ -129,6 +133,8 @@ class Arduino:
                 self.current_right_keyboard = kbd
 
         keyboard_dao.send_set_current_keyboard(kbd)
+
+        self.keyboards_list_changed()
 
     def store_keyboard(self, kbd: Keyboard):
         """
@@ -159,6 +165,7 @@ class Arduino:
                     break
 
             self.stored_keyboards.append(kbd)
+        self.keyboards_list_changed()
 
     def delete_keyboard(self, kbd: Keyboard):
         """
@@ -187,6 +194,7 @@ class Arduino:
                 if type(std_kb) == type(kbd) and std_kb.name == kbd.name:
                     self.stored_keyboards.remove(std_kb)
                     break
+        self.keyboards_list_changed()
 
     def rename_keyboard(self, kbd: Keyboard, new_name: str):
         """
@@ -217,3 +225,4 @@ class Arduino:
                 if type(std_kb) == type(kbd) and std_kb.name == kbd.name:
                     std_kb.name = new_name
                     break
+        self.keyboards_list_changed()
