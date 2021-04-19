@@ -89,7 +89,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         None.
 
         """
-        midiio.send_sysex([0x00])
+        midiio.send_sysex(bytes([0x00]))
 
     def send_set_current_keyboard(self, kbd: Keyboard) -> None:
         """
@@ -141,7 +141,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         None.
 
         """
-        data = [0x04]
+        data = bytes([0x04])
         data += bytes([self._keyboard_type])
         data += base64.b64encode(kbd.name.encode('utf-8'))
         data += bytes([0x00])
@@ -164,7 +164,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         None.
 
         """
-        data = [0x08]
+        data = bytes([0x08])
         data += bytes([self._keyboard_type])
         data += base64.b64encode(kbd.name.encode('utf-8'))
         data += bytes([0x00])
