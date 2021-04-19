@@ -15,11 +15,11 @@ from PyQt5.QtGui import QIcon
 from core import ControllerCore
 from core.keyboard import Right81ButtonKeyboard
 
+import gui.resources  # pylint: disable=W0611
 from .toolbar import ToolBar
-from .keyboardselection import KeyboardFileSelection
+from .keyboardselection import ArduinoSelectionDock
 from .keyboardview import CurrentKeyboardsWidget
 from .settings import SettingsDialog
-import gui.resources  # pylint: disable=W0611
 
 
 class ControllerGUI(QMainWindow):
@@ -162,6 +162,7 @@ class ControllerGUI(QMainWindow):
     def load_settings(self):
         """Update UI and core regarding settings."""
         settings = QSettings()
+
         settings.beginGroup("midi")
         self.controller.close_midi()
         inprt = str(settings.value("inport", "-"))
@@ -170,8 +171,23 @@ class ControllerGUI(QMainWindow):
         outprt = str(settings.value("outport", "-"))
         if outprt == "-":
             outprt = None
+
         self.controller.connect_midi(inprt, outprt)
-        settings.endGroup()
+
+        if self.controller.is_midi_output_ready():
+            self.actions.send.setEnabled(True)
+            self.actions.store.setEnabled(True)
+        else:
+            self.actions.send.setEnabled(False)
+            self.actions.store.setEnabled(False)
+
+        if(self.controller.is_midi_input_ready()
+           and self.controller.is_midi_output_ready()):
+            self.actions.pull.setEnabled(True)
+        else:
+            self.actions.pull.setEnabled(False)
+
+        settings.endGroup()  # midi
 
     def populate_keyboard_selection_model(self):
         """
@@ -271,12 +287,13 @@ class Actions(QObject):
             self.tr('Settings'),
             owner)
         self.settings.setShortcut('Ctrl+P')
-        self.settings.setStatusTip(self.tr('Redo last undoed action'))
+        self.settings.setStatusTip(self.tr('Open settings dialog'))
         # Pull from Arduino
         self.pull = QAction(
             QIcon(':/icons/download-button.svg'),
-            self.tr('Pull keyboards from accordion'),
+            self.tr('Pull keyboards'),
             owner)
+        self.pull.setStatusTip(self.tr('Pull keyboards from accordion'))
         # Clone
         self.clone_keyboard = QAction(
             QIcon(':/icons/copy-content.svg'),
@@ -315,9 +332,9 @@ class CreateKeyboardDialog(QDialog):
     keyboard_types = [{'name': QCoreApplication.translate(
         'CreateKeyboardDialog',
         'Right 81 Buttons Keyboard'),
-                       'type': Right81ButtonKeyboard,
-                       'desc': QCoreApplication.translate(
-                           'CreateKeyboardDialog', """
+        'type': Right81ButtonKeyboard,
+        'desc': QCoreApplication.translate(
+        'CreateKeyboardDialog', """
 <p>A right button keyboard of 81 button, as 4 rows of 16 buttons
 and 1 row of 17 buttons.</p>
 <br/>

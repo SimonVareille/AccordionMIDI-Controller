@@ -180,7 +180,7 @@ class ControllerCore:
 
     def is_midi_output_ready(self):
         """Return True if the MIDI output port is ready, False otherwise."""
-        return midiio.input_ready()
+        return midiio.output_ready()
 
     def list_midi_ports(self):
         """

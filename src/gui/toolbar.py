@@ -14,9 +14,6 @@ class ToolBar(QToolBar):
             QApplication.translate("ToolBar", "Keyboard actions"),
             owner, *args, **kwargs)
 
-        # disable toolbuttons that needs input or output port initialized
-        actions.pull.setEnabled(False)
-
         # populate toolbar
         self.addAction(actions.pull)
         self.addAction(actions.new)
