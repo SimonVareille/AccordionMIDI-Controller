@@ -117,6 +117,10 @@ class ControllerCore:
         self.keyboards.append(kbd_state)
         return kbd_state
 
+    def pull_keyboards(self):
+        """Ask arduino to send keyboards."""
+        self.arduino.fetch_keyboards()
+
     def get_known_keyboards(self, origin: List[Origin] = None
                             ) -> Dict[Origin, List[Keyboard]]:
         """

@@ -96,8 +96,7 @@ class ControllerGUI(QMainWindow):
         self.actions.settings.triggered.connect(self.settings_dialog)
         self.actions.send.triggered.connect(self.current_keyboards.send)
         self.actions.store.triggered.connect(self.current_keyboards.store)
-        # self.actions.pull.triggered.connect(
-        #     self.pull_layouts)
+        self.actions.pull.triggered.connect(self.controller.pull_keyboards)
         # self.actions.create_keyboard.triggered.connect(
         #     self.create_layout)
         # self.actions.clone_keyboard.triggered.connect(
