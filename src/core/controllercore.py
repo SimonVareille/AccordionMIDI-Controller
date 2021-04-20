@@ -3,7 +3,7 @@
 Contains everything a UI should need.
 """
 import os
-from typing import Dict, List
+from typing import Dict, List, Union
 from copy import deepcopy
 
 from .origin import Origin
@@ -24,14 +24,22 @@ class ControllerCore:
         self.arduino = Arduino()
         self.history = History()
 
-    def open(self, filename: str) -> 'KeyboardState':
+    def open(self, descriptor: Union[str, Keyboard]) -> 'KeyboardState':
         """
-        Open a file containig a keyboard.
+        Open a keyboard.
+
+        The keyboard comes either from a file or from a Keyboard object.
 
         Parameters
         ----------
-        filename : str
-            The file to open.
+        descriptor : Union[str, Keyboard]
+            If `descriptor` is a str, the file to open.
+            If `descriptor` is a Keyboard, the keyboard to open.
+
+        Raises
+        ------
+        UnknownFileTypeError
+            The given file have an unknown type.
 
         Returns
         -------
@@ -39,20 +47,28 @@ class ControllerCore:
             The opened keyboard.
 
         """
-        for kbd in self.keyboards:
-            if os.path.samefile(kbd.storage.filename, filename):
-                return kbd
+        if isinstance(descriptor, str):
+            filename = descriptor
+            for kbd in self.keyboards:
+                if os.path.samefile(kbd.storage.filename, filename):
+                    return kbd
 
-        kbd_state = KeyboardState()
-        _, ext = os.path.splitext(filename)
-
-        if ext == '.json':
-            kbd_state.storage = JsonFile(filename)
+            kbd_state = KeyboardState()
+            _, ext = os.path.splitext(filename)
+    
+            if ext == '.json':
+                kbd_state.storage = JsonFile(filename)
+            else:
+                raise UnknownFileTypeError(f"The file '{filename}' is of unknown "
+                                           "type.")
+            kbd_state.load()
         else:
-            raise UnknownFileTypeError(f"The file '{filename}' is of unknown "
-                                       "type.")
+            keyboard = descriptor
+            for kbd in self.keyboards:
+                if kbd.keyboard == keyboard:
+                    return kbd
+            kbd_state = KeyboardState(keyboard)
 
-        kbd_state.load()
         self.keyboards.append(kbd_state)
         return kbd_state
 

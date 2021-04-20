@@ -73,6 +73,8 @@ class ControllerGUI(QMainWindow):
         self.arduino_keyboards.setAllowedAreas(
             Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.arduino_keyboards)
+        self.arduino_keyboards.keyboard_selected.connect(
+            self.open_keyboard)
 
         self.current_keyboards = CurrentKeyboardsWidget(self, self.controller)
         self.setCentralWidget(self.current_keyboards)
@@ -143,6 +145,27 @@ class ControllerGUI(QMainWindow):
         if filename:
             keyboard_state = self.controller.open(filename)
             self.current_keyboards.display_keyboard(keyboard_state)
+
+    def open_keyboard(self, kbd):
+        """
+        Open the given keyboard.
+
+        If the keyboard is already open in one of the controller core's
+        KeyboardState, switch to it. Otherwise create a new KeyboardState.
+
+        Parameters
+        ----------
+        kbd : Keyboard
+            The keyboard to open.
+
+        Returns
+        -------
+        None.
+
+        """
+        print("Open keyboard")
+        keyboard_state = self.controller.open(kbd)
+        self.current_keyboards.display_keyboard(keyboard_state)
 
     def create_keyboard_dialog(self):
         """

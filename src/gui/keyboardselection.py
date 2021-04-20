@@ -1,8 +1,9 @@
 """Keyboard selection widgets."""
 
 import os
+import inspect
 
-from PyQt5.QtCore import QDir, QCoreApplication
+from PyQt5.QtCore import QDir, QCoreApplication, pyqtSignal
 from PyQt5.QtWidgets import QDockWidget, QTreeView, QFileSystemModel,\
     QVBoxLayout, QListView, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -35,17 +36,22 @@ class KeyboardFileSelection(QDockWidget):
 class ArduinoSelectionDock(QDockWidget):
     """Dock for displaying the keyboards currently within the Arduino."""
 
+    keyboard_selected = pyqtSignal(Keyboard)
+
     def __init__(self, parent, controller, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.controller = controller
         self.setWindowTitle(self.tr("Arduino's keyboards"))
 
         arduino_widget = ArduinoSelectionWidget(controller)
+        arduino_widget.keyboard_selected.connect(self.keyboard_selected)
         self.setWidget(arduino_widget)
 
 
 class ArduinoSelectionWidget(QWidget):
     """Widget containing everithing needed to display keyboards of Arduino."""
+
+    keyboard_selected = pyqtSignal(Keyboard)
 
     def __init__(self, controller, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,12 +64,16 @@ class ArduinoSelectionWidget(QWidget):
         self.current_kbd_model = ArduinoSelectionModel()
         self.current_keyboards.setModel(self.current_kbd_model)
         self.current_keyboards.setHeaderHidden(True)
+        self.current_keyboards.doubleClicked.connect(
+            self.current_keyboard_clicked)
 
         stored_kbds_label = QLabel(self.tr("Stored keyboards"))
         self.stored_keyboards = QTreeView()
         self.stored_kbd_model = ArduinoSelectionModel()
         self.stored_keyboards.setModel(self.stored_kbd_model)
         self.stored_keyboards.setHeaderHidden(True)
+        self.stored_keyboards.doubleClicked.connect(
+            self.stored_keyboard_clicked)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(curr_kbds_label)
@@ -90,8 +100,18 @@ class ArduinoSelectionWidget(QWidget):
             self.current_kbd_model.add_keyboard(current)
 
     def current_keyboard_clicked(self, index):
-        pass
+        item = self.current_kbd_model.itemFromIndex(index)
+        if inspect.isclass(item.data()):
+            return
+        kbd = item.data()
+        self.keyboard_selected.emit(kbd)
 
+    def stored_keyboard_clicked(self, index):
+        item = self.stored_kbd_model.itemFromIndex(index)
+        if inspect.isclass(item.data()):
+            return
+        kbd = item.data()
+        self.keyboard_selected.emit(kbd)
 
 class ArduinoSelectionModel(QStandardItemModel):
     """Provide a data model for the keyboard selection."""
@@ -109,6 +129,7 @@ class ArduinoSelectionModel(QStandardItemModel):
         self.type_items = {}
 
     def clear(self):
+        """Clear the model."""
         self.type_items = {}
         super().clear()
 
@@ -131,10 +152,14 @@ class ArduinoSelectionModel(QStandardItemModel):
                 self.type_desc[type(kbd)]['desc'])
             item = self.type_items[type(kbd)]
             item.setEditable(False)
+            item.setEnabled(False)
+            item.setSelectable(False)
+            item.setData(type(kbd))
             self.invisibleRootItem().appendRow(item)
 
         type_item = self.type_items[type(kbd)]
         item = QStandardItem(kbd.name)
+        item.setData(kbd)
         item.setEditable(False)
 
         type_item.appendRow(item)
