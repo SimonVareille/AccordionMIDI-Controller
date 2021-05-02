@@ -200,7 +200,10 @@ class ControllerGUI(QMainWindow):
         if outprt == "-":
             outprt = None
 
-        self.controller.connect_midi(inprt, outprt)
+        try:
+            self.controller.connect_midi(inprt, outprt)
+        except IOError:
+            pass
 
         if self.controller.is_midi_output_ready():
             self.actions.send.setEnabled(True)
