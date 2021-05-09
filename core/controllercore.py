@@ -50,17 +50,18 @@ class ControllerCore:
         if isinstance(descriptor, str):
             filename = descriptor
             for kbd in self.keyboards:
-                if os.path.samefile(kbd.storage.filename, filename):
+                if kbd.storage and os.path.samefile(kbd.storage.filename,
+                                                    filename):
                     return kbd
 
             kbd_state = KeyboardState()
             _, ext = os.path.splitext(filename)
-    
+
             if ext == '.json':
                 kbd_state.storage = JsonFile(filename)
             else:
-                raise UnknownFileTypeError(f"The file '{filename}' is of unknown "
-                                           "type.")
+                raise UnknownFileTypeError(f"The file '{filename}' is of "
+                                           "unknown type.")
             kbd_state.load()
         else:
             keyboard = descriptor
