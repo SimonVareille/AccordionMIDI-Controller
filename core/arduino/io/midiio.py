@@ -222,5 +222,5 @@ def send_sysex(data: bytes):
 def _message_recv(message: mido.Message):
     """Receive messages callback."""
     if message.type == "sysex":
-        if message.data[0] == 0x7d:
+        if message.data and message.data[0] == 0x7d:
             _process_sysex(message.data[1:])
