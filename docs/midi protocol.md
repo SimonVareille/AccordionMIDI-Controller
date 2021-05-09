@@ -51,7 +51,8 @@ With:
    section.
 - `name` the name of the keyboard. Must end with `0x00`. As original name is a
 UTF-8 string, it must be converted to 7-bit stream. We simply use base-64
-encoding to send it.
+encoding to send it. The length of name can be at most 108 bytes. 
+We can thus have name of at most 27 characters with 4-bytes UTF-8 code points.
 - `data` the data of the keyboard. See [Keyboard types](#keyboard-types) section.
 
 ### Sending a keyboard to/from the Arduino RAM
