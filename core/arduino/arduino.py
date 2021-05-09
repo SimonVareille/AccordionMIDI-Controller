@@ -105,6 +105,10 @@ class Arduino:
         """
         with self.stored_lock:
             self.stored_keyboards.clear()
+        with self.left_lock:
+            self.current_left_keyboard = None
+        with self.right_lock:
+            self.current_right_keyboard = None
         self.dao_factory.get_generic_keyboard_dao().send_fetch_keyboards()
         self.keyboards_list_changed()
 
