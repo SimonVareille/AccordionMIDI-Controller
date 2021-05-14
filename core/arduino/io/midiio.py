@@ -1,6 +1,8 @@
 """Communication between arduino and computer, through MIDI."""
 
+import threading
 from typing import List
+from collections import deque
 import mido
 from .dao.midi import Right81ButtonKeyboardMidiDAO, Left96ButtonKeyboardMidiDAO
 
@@ -22,6 +24,9 @@ Must take two parameters:
     keyboard: The received keyboard.
     origin: The keyboard's origin (from EEPROM or RAM) as string.
 """
+
+_sysex_queue = deque()
+_sysex_lock = threading.Lock()
 
 
 def _clear_inport_callback():
@@ -187,8 +192,8 @@ def output_ready() -> bool:
 
 def _process_sysex(data: bytes):
     if data:
-        if (data[0] & 1 or  # receiving a keyboard from EEPROM
-           data[0] & 2):  # receiving a keyboard from RAM
+        if (data[0] == 1 or  # receiving a keyboard from EEPROM
+           data[0] == 2):  # receiving a keyboard from RAM
             dao = None
             if data[1] == 0x01:
                 dao = Right81ButtonKeyboardMidiDAO()
@@ -199,11 +204,20 @@ def _process_sysex(data: bytes):
                 keyboard = dao.from_bytes(data[1:])
                 # pylint: disable=E1102
                 callback(keyboard, "EEPROM" if data[0] == 1 else "RAM")
+        elif data[0] == 0x0F:  # receiving confirmation for sending a SysEx
+            with _sysex_lock:
+                if len(_sysex_queue):
+                    outport.send(_sysex_queue.popleft())
+                    if len(_sysex_queue):
+                        _send_pre_sysex()
 
 
-def send_sysex(data: bytes):
+def send_direct_sysex(data: bytes):
     """
     Send a sysex message with given data.
+
+    The SysEx is immediatly sent. To warn the receiver that a SysEx will be
+    sent, use send_sysex() instead.
 
     Parameters
     ----------
@@ -217,6 +231,36 @@ def send_sysex(data: bytes):
     """
     msg = mido.Message("sysex", data=bytes([0x7d]) + data)
     outport.send(msg)
+
+
+def send_sysex(data: bytes):
+    """
+    Send a sysex message with given data.
+
+    Warn the receiver that a SysEx will be sent.
+    If a previous SysEx is already in the send queue, wait for this SysEx to
+    be sent.
+
+    Parameters
+    ----------
+    data : list of bytes
+        Bytearray, list or tuple of bytes to send.
+
+    Returns
+    -------
+    None.
+
+    """
+    msg = mido.Message("sysex", data=bytes([0x7d]) + data)
+    with _sysex_lock:
+        _sysex_queue.append(msg)
+        if len(_sysex_queue) == 1:
+            _send_pre_sysex()
+
+
+def _send_pre_sysex():
+    """Warn the receiver that a long SysEx will be sent."""
+    send_direct_sysex(bytes([0x0f]))
 
 
 def _message_recv(message: mido.Message):

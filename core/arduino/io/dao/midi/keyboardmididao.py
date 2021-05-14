@@ -89,7 +89,7 @@ class KeyboardMidiDAO(KeyboardDAO):
         None.
 
         """
-        midiio.send_sysex(bytes([0x00]))
+        midiio.send_direct_sysex(bytes([0x00]))
 
     def send_set_current_keyboard(self, kbd: Keyboard) -> None:
         """

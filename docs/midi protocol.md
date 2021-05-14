@@ -25,6 +25,12 @@ XX
 
 With `XX` to be replaced by the bytes presented in the *format* part.
 
+### Preparing a SysEx
+
+When sending a SysEx message, the controller must send a `0x0F` SysEx.
+It must then wait for the `0x0F` confirmation SysEx before sending the main
+message.
+
 ### Fetching the list of keyboard
 
 The format to ask for the list of known keyboard is:
