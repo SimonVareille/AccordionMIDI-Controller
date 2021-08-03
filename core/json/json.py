@@ -23,7 +23,7 @@ class JsonFile:
             The loaded keyboard.
 
         """
-        with open(self.filename, "r") as file:
+        with open(self.filename, "r", encoding="utf-8") as file:
             try:
                 return keyboard_from_dict(json.load(file))
             except KeyError as err:
